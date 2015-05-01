@@ -1,5 +1,5 @@
 {
-  "name":"Ultimate Totals",
+  "name":"ghap.me",
   "version":"0.0.1",
   "description":"",
   "dependencies":{
@@ -33,8 +33,8 @@
     "watchify":"^2.0.0"
   },
   "config": {
-    "name":"Ultimate Totals",
-    "db":"ultimate_totals",
+    "name":"ghap.me",
+    "db":"ghap_db",
     "port": 9001,
     "admin_email":"admin@ut.com",
     "host": "www.ultimatetotals.com",
