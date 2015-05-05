@@ -3,11 +3,11 @@ html
   head
     meta(charset='UTF-8')  
     meta(http-equiv='X-UA-Compatible', content='IE=edge')  
-    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no;')
+    meta(name='viewport', content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no')
     title Garrett Haptonstall | ghap.me 
     link(rel='shortcut icon', href='img/favicon.png')
 
-    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')   
+    link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')   
     link(rel='stylesheet', href='css/styles.css')
     link(rel='stylesheet', href='css/mobile.css')
 
@@ -22,7 +22,9 @@ html
       a.page-scroll(href='#') Scroll
 
     script(src='/js/jquery/jquery.min.js')
+    script(src='/js/modernizr.js')
+
     script(src='#{release.js.app}')
-    script(src='/js/scripts.js')
+
     block js
               
