@@ -1,3 +1,7 @@
+var App = require('app');
 
-$('.preloader').hide();
+$(function(){
 
+  App.load();
+
+});

@@ -1,37 +1,3 @@
-/*
-====================================================
-
-====================================================
-
-   TOC:
-  =======
-  0. Webfonts and Icon fonts Import
-
-  1. Primary Styles
-      a. Color Schemes for Homepage
-      b. Fun Facts Styles
-      c. Footer Styles
-
-  2. Preloader Styles
-
-  3. Main Components
-
-  4. Profile Section
-      a. Services Styles
-
-  5. Resume Section
-      a. Skills Styles
-      b. Recognition Styles
-
-  6. Portfolio Section
-      a. Testimonials Styles
-
-  7. Contact Section
-      a. Social and Map Styles
-
-===================================================== */
-
-
 /* --------------------------------- */
 /* 0. Webfonts and Icon fonts
  ----------------------------------- */
@@ -57,8 +23,8 @@ html {
 body {
   background:#101524;
   font-size:1.6rem;
-  font-family:"PT Sans",sans-serif;
-  color:#fff
+  font-family: "PT Sans",sans-serif;
+  color:#fff;
 }
 
 a {
@@ -71,7 +37,7 @@ a:hover, a:active, a:focus {
 }
 
 h1,h2,h3,h4,h5,h6 {
-  font-family:"Merriweather",serif
+  font-family: "Merriweather",serif
 }
 
 h1 {
@@ -186,60 +152,9 @@ ul li {
   -ms-transition: box-shadow .4s ease-in-out;
   transition: box-shadow .4s ease-in-out
 }
-
-
-/* ------------------------------------------------
-/*  1.a. Color Schemes for Home Page backgrounds 
-/*  Choose one and comment/remove other two
-/* ------------------------------------------------*/
-
-
-/* Olive Scheme  
-----------------------------------*/
-
-.single-page:nth-child(1) {
-  background: #191D21;
-}
-
-.single-page:nth-child(2) {
-  background: #1F2628;
-}
-
-.single-page:nth-child(3) {
-  background:  #273336;
-}
-
-.single-page:nth-child(4) {
-  background: #273a3f;
-}
-
-
-
-/* Colorful Scheme
-----------------------------------*/
-
-/*.single-page:nth-child(1) {
-  background:#FF6F6F
-}
-
-.single-page:nth-child(2) {
-  background:#0ED4C8
-}
-
-.single-page:nth-child(3) {
-  background:#6bd57e
-}
-
-.single-page:nth-child(4) {
-  background:#FE7C60
-}
-*/
-
-
 /* Dark Scheme 
 ----------------------------------*/
-
-/*.single-page:nth-child(1) {
+.single-page:nth-child(1) {
   background:#14151B
 }
 
@@ -254,13 +169,6 @@ ul li {
 .single-page:nth-child(4) {
   background:#252733
 }
-*/
-
-
-/* -------------------------------- 
-    1.b. Fun Facts Styles
--------------------------------- */
-
 .fun-facts {
   background:url("../img/fun-bg.jpg") no-repeat scroll center center rgba(0,0,0,0);
   overflow:hidden;
@@ -355,7 +263,7 @@ ul li {
 /* 2. Preloader CSS */ 
 /* ------------------------------------------- */
 
-#preloader{
+.preloader{
   background-color:#101524; 
   position:fixed;
   left:0;
