@@ -1,9 +1,23 @@
+/* ----------------------------- *
+ * Site Theme CSS                *
+ * @athor: Garrett Haptonstall   *
+ * <ghaptonstall@gmail.com>      *
+ * ----------------------------- */
+
+/* Global Variables */
+/* ----------------------------- */
 @import 'variables.less';
+
+/* Mixins */
+/* ----------------------------- */
 @import 'mixins.less';
 
-@import url("https://fonts.googleapis.com/css?family=PT+Sans:400,700|Merriweather:400italic,400");
-@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css");
+/* Mixins */
+/* ----------------------------- */
+@import 'bootstrap.less';
 
+/* Theme */
+/* ----------------------------- */
 *,::after,::before {
   -webkit-box-sizing:border-box;
   -moz-box-sizing:border-box;
@@ -12,15 +26,6 @@
 
 html {
   font-size:62.5%;
-}
-.row {
-  padding:30px 0;
-}
-.quoteline{
-  font-family: oswald, Impact, 'Arial Narrow Bold', sans-serif;
-  font-size: 22px;
-  letter-spacing: 1px;
-  font-weight: 300;
 }
 p.static-p {
   color: @offBlack;
@@ -74,44 +79,6 @@ h6 {
 ul li {
   list-style: none;
 }
-
-.btn {
-  position:relative;
-  overflow:hidden;
-  display:inline-block;
-  vertical-align:top;
-  color:#34a1c4;
-  text-decoration:none;
-  font-weight:700;
-  border:2px solid #34a1c4;
-  padding:1em 5em;
-  -webkit-transition: all .2s;
-  -moz-transition: all .2s;
-  -ms-transition: all .2s;
-  -o-transition: all .2s;
-  transition: all .2s
-}
-
-.btn:hover {
-  background:#34a1c4;
-  color:#fff;
-  padding:1em 5em
-}
-
-.btn:after {
-  position:absolute;
-  content:'\f18e';
-  font-family:'FontAwesome';
-  font-weight:400;
-  right:-3em;
-  transition: .4s;
-  color:#fff
-}
-
-.btn:hover:after {
-  right:2em
-}
-
 
 .menu-desc {
   opacity:0!important;
@@ -574,62 +541,6 @@ ul li {
   -o-transform: translateX(-50%) scale(1.2);
   transform: translateX(-50%) scale(1.2)
 }
-
-@-webkit-keyframes cd-translate {
-0% {
-  -webkit-transform: translateX(-50%) scale(1)
-}
-
-50% {
-  -webkit-transform: translateY(10px) translateX(-50%) scale(1)
-}
-
-100% {
-  -webkit-transform: translateX(-50%) scale(1)
-}
-}
-
-@-moz-keyframes cd-translate {
-0% {
-  -moz-transform: translateX(-50%) scale(1)
-}
-
-50% {
-  -moz-transform: translateY(10px) translateX(-50%) scale(1)
-}
-
-100% {
-  -moz-transform: translateX(-50%) scale(1)
-}
-}
-
-@keyframes cd-translate {
-0% {
-  -webkit-transform: translateX(-50%) scale(1);
-  -moz-transform: translateX(-50%) scale(1);
-  -ms-transform: translateX(-50%) scale(1);
-  -o-transform: translateX(-50%) scale(1);
-  transform: translateX(-50%) scale(1)
-}
-
-50% {
-  -webkit-transform: translateY(10px) translateX(-50%) scale(1);
-  -moz-transform: translateY(10px) translateX(-50%) scale(1);
-  -ms-transform: translateY(10px) translateX(-50%) scale(1);
-  -o-transform: translateY(10px) translateX(-50%) scale(1);
-  transform: translateY(10px) translateX(-50%) scale(1)
-}
-
-100% {
-  -webkit-transform: translateX(-50%) scale(1);
-  -moz-transform: translateX(-50%) scale(1);
-  -ms-transform: translateX(-50%) scale(1);
-  -o-transform: translateX(-50%) scale(1);
-  transform: translateX(-50%) scale(1)
-}
-}
-
-
 /* Screens Resolution : 768px+
 --------------------------------------------------------------------- */
 
@@ -2212,4 +2123,5 @@ color:#fff;
 	left: auto;
 	right: 0;
 }
+
 
