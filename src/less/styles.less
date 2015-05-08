@@ -13,6 +13,18 @@
 html {
   font-size:62.5%;
 }
+.row {
+  padding:30px 0;
+}
+.quoteline{
+  font-family: oswald, Impact, 'Arial Narrow Bold', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  font-weight: 300;
+}
+p.static-p {
+  color: @offBlack;
+}
 
 body {
   background:#101524;
@@ -2144,5 +2156,60 @@ color:#fff;
 	display: block;
 }
 
-
+.section-title div {
+	width: 80px;
+	height: 80px;
+	margin: 0 auto 0px auto;
+	background-color: #cccccc;
+	border-radius: 100%;
+	-webkit-border-radius: 100%;
+}
+.section-title div span {
+	color: #ffffff;
+	margin-top: 27px;
+}
+.section-title h1 span {
+	background-color: rgba(59, 63, 80, 0.6);
+	border-radius: 6px;
+	-webkit-border-radius: 6px;
+	color: #fff;
+	padding: 0px 10px;
+}
+.section-title h1.white span {
+	background-color: rgba(239,239,239,0.6);
+	border-radius: 6px;
+	-webkit-border-radius: 6px;
+	color: #fff;
+	padding: 0px 10px;
+}
+.section-title h1:not(.layerslider-heading) {
+  font-size: 46px !important;
+  letter-spacing: 2px !important;
+  line-height: 1.6 !important;
+  margin: 20px auto 50px;
+  padding: 0 40px;
+  position: relative;
+}
+.section-title h1, .section-title h2, .section-title h3 {
+	text-transform: uppercase;
+	color: #666666;
+	font-weight: 700;
+	display: inline-block;
+}
+.section-title h1:before, .section-title h1:after {
+	background: none repeat scroll 0 0 #666666;
+	content: "";
+	height: 2px;
+	left: 0;
+	position: absolute;
+	top: 35px;
+	width: 30px;
+}
+.section-title h1.white:before, .section-title h1.white:after {
+	background: none repeat scroll 0 0 #ffffff;
+}
+.section-title h1:after {
+	left: auto;
+	right: 0;
+}
 
