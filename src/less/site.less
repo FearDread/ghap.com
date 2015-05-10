@@ -8,11 +8,15 @@
 /* ----------------------------- */
 @import 'variables.less';
 
+/* Animations */
+/* ----------------------------- */
+@import 'animations.less';
+
 /* Mixins */
 /* ----------------------------- */
 @import 'mixins.less';
 
-/* Mixins */
+/* Bootstrap Styles */
 /* ----------------------------- */
 @import 'bootstrap.less';
 
@@ -237,27 +241,39 @@ ul li {
 /* ------------------------------------------- */
 
 .preloader{
-  background-color:#101524; 
+  background: @black;
   position:fixed;
-  left:0;
-  top:0;
   width:100%;
   height:100%;
-  z-index:9999;  
+  top:0;
+  left:0;
+  z-index:99;
+  .loader {
+    display:inline-block;
+    width:100%;
+    text-align:center;
+    position:relative;
+    top:45%;
+  }
+  .dots {
+    display: inline-block;
+    position: relative;
+
+    &:not(:last-child){
+      margin-right: @dotSize*1.5;
+    }
+
+    &:before, &:after {
+      content: "";
+      display: inline-block;
+      width: @dotSize;
+      height: @dotSize;
+      border-radius: 50%;
+      position: absolute;
+    }
+  }
+  .dots-loop(10);
 }
-
-.loader {
-  background: url("../img/svg-loaders/puff.svg") no-repeat scroll center center rgba(0, 0, 0, 0);
-  height: 50px;
-  width: 50px;
-  position: absolute;
-  left: calc(50% - 25px);
-  top: calc(50% - 25px);
-
-}
-
-
-
 /* -------------------------------- 
 /*   3. Main Components 
 -------------------------------- */
