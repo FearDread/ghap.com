@@ -11,8 +11,8 @@ html
     link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
     link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css')
 
-    link(rel='stylesheet', href='css/site.css')
-    link(rel='stylesheet', href='css/mobile.css')
+    link(rel='stylesheet', href='/css/site.css')
+    link(rel='stylesheet', href='/css/mobile.css')
 
   body
     include loader
@@ -27,7 +27,8 @@ html
     script(src='/js/guerilla-ui.min.js')
     script(src='/js/modernizr.js')
 
-    script(src='#{release.js.app}')
+    //script(src='#{release.js.app}')
+    script(src='/js/app.js')
 
     block js
               

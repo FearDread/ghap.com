@@ -1,4 +1,5 @@
 var App = require('app');
+console.log('working');
 
 $(function(){
 
