@@ -129,6 +129,16 @@ utils = {
     },
 
     /**
+    * Check if user agent is mobile device 
+    *
+    * @param agent {string} - user agent
+    * @return {boolean} 
+    **/
+    isMobile: function(agent) {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(agent);
+    },
+
+    /**
     * Return number of keys in first level of object
     *
     * @param object - object to size
@@ -894,6 +904,7 @@ Broker = (function() {
             for (key in this) {
 
                 value = this[key];
+
                 if (forced) {
                     obj[key] = value;
                 } else {
@@ -1013,41 +1024,39 @@ API = function() {
 
     return {
         // create new API sandbox instance
-        create: function(core, instance, options, module) {
+        create: function(gui, instance, options, module) {
 
-            // set sandbox vars
+            /* Sandbox identefiers */ 
             this.id = instance;
             this.module = module;
             this.options = (options !== null) ? options : {}; 
 
-            // attach new sandbox instance
-            core._broker.install(this);
+            /* Attach Broker methods to sandbox api */ 
+            gui._broker.install(this);
+            this.broker = gui._broker;
 
-            // this.Broker = core._broker;
-
-            // add utils object
+            /* Add utils object to sandbox api */
             this.utils = utils;
              
             /* jQuery wrappers */
-            // Ajax shorthand reference
             this.xhr = $.ajax;
             this.data = $.data;
-            this.Deferred = $.Deferred;
-            this.Animation = $.Animation;
+            this.deferred = $.Deferred;
+            this.animation = $.Animation;
 
-            // each loop reference
-            this.each = utils.each;
+            /* Module Namespaces */ 
+            this.ui = {};
+            this.dom = {};
+            this.net = {};
+            this.util = {};
 
-            // reference debug methods 
-            this.log = function() {
-                return core.debug.log(arguments);
-            };
-
-            this.warn = function() {
-                return core.debug.warn(arguments);
-            };
-
-            // find selector in dom with wrapped methods
+            /**
+             * Search DOM for selector and wrap with both native and jQuery helper methods 
+             *
+             * @param selector {string} - the element to scan DOM for
+             * @param context {object} - optional context object to be applied to returned object wrapper
+             * @return {object} - GUI and jQuery wrapped element DOM object 
+            **/
             this.query = function(selector, context) {
                 var $el, _ret = {}, _this = this;
                 
@@ -1087,12 +1096,40 @@ API = function() {
             };
 
             /**
+             * Assign $ as shorthand query method 
+            **/
+            this.$ = this.query;
+
+            /**
+             * Reference utils / jQuery each method 
+            **/
+            this.each = utils.each;
+
+            /**
+             * Reference GUI core log method 
+             *
+             * @return {function} 
+            **/
+            this.log = function() {
+                return gui.debug.log(arguments);
+            };
+
+            /**
+             * Reference GUI core warn method 
+             *
+             * @return {function}
+            **/
+            this.warn = function() {
+                return gui.debug.warn(arguments);
+            };
+
+            /**
              * Get location with stored reference to window object 
              *
-             * @return {object} - window ref
+             * @return {object} - specific window reference location 
             **/
             this.getLocation = function() {
-                var win = core.config.win;
+                var win = gui.config.win;
 
                 return win && win.location;
             };
@@ -1178,9 +1215,7 @@ GUI = (function($) {
             /* GUI library version */
             version: '0.1.3',
             jquery: true,
-            animations: false,
-            /* Stored window reference */
-            win: (typeof window !== 'undefined') ? window : null
+            animations: false
         };
 
         // ability to pass optional config object
@@ -1853,14 +1888,188 @@ GUI = (function($) {
 })(jQuery);
 ;/* --------------------------------------- *
 * Guerrilla UI                             *
-* @module: MVC Model object class          * 
+* @module: Map, basic key value map store  * 
 * ---------------------------------------- */
+$.GUI().use(function(gui) {
 
-$.GUI().use(function(G) {
+    Map = window.Map || window.MozMap || (Map = (function() {
+
+        function Map() {
+            this.keys = [];
+            this.values = [];
+        }
+
+        Map.prototype.get = function(key) {
+            var i, item, j, ref;
+
+            ref = this.keys;
+
+            for (i = j = 0; j < ref.length; i = ++j) {
+                item = ref[i];
+
+                if (item === key) {
+
+                    return this.values[i];
+                }
+            }
+        };
+
+        Map.prototype.set = function(key, value) {
+            var i, item, j, ref;
+
+            ref = this.keys;
+
+            for (i = j = 0; j < ref.length; i = ++j) {
+                item = ref[i];
+
+                if (item === key) {
+                    this.values[i] = value;
+                    return;
+                }
+            }
+
+            this.keys.push(key);
+            return this.values.push(value);
+        };
+
+        return Map;
+
+    })());
+
+    return {
+
+        load: function(api) {
+
+          api.dom.map = new Map();
+        },
+        unload: function() {}
+    };
+});
+;/* --------------------------------------- *
+* Guerrilla UI                             *
+* @module: Event, dom & element events api * 
+* ---------------------------------------- */
+$.GUI().use(function(gui) {
+
+    Event = (function() {
+
+        function Event() {}
+
+        Event.prototype.isMobile = function(agent) {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(agent);
+        };
+
+        Event.prototype.create = function(event, bubble, cancel, detail) {
+            var customEvent;
+
+            if (!bubble || bubble === null) {
+                bubble = false;
+            }
+
+            if (!cancel || cancel === null) {
+                cancel = false;
+            }
+
+            if (!detail || detail === null) {
+                detail = null;
+            }
+
+            if (document.createEvent !== null) {
+
+                customEvent = document.createEvent('CustomEvent');
+                customEvent.initCustomEvent(event, bubble, cancel, detail);
+
+            } else if (document.createEventObject != null) {
+
+                customEvent = document.createEventObject();
+                customEvent.eventType = event;
+
+            } else {
+
+                customEvent.eventName = event;
+            }
+
+            return customEvent;
+        };
+
+        Event.prototype.fire = function(elem, event) {
+            if (elem.dispatchEvent && elem.dispatchEvent !== null) {
+
+                return elem.dispatchEvent(event);
+
+            } else if (event in (elem !== null)) {
+
+                return elem[event]();
+
+            } else if (("on" + event) in (elem !== null)) {
+
+                return elem["on" + event]();
+            }
+        };
+
+        Event.prototype.add = function(elem, event, fn) {
+            if (elem.addEventListener !== null) {
+
+                return elem.addEventListener(event, fn, false);
+
+            } else if (elem.attachEvent !== null) {
+
+                return elem.attachEvent("on" + event, fn);
+
+            } else {
+
+                return elem[event] = fn;
+            }
+        };
+
+        Event.prototype.remove = function(elem, event, fn) {
+            if (elem.removeEventListener !== null) {
+
+                return elem.removeEventListener(event, fn, false);
+
+            } else if (elem.detachEvent !== null) {
+
+                return elem.detachEvent("on" + event, fn);
+
+            } else {
+
+                return delete elem[event];
+            }
+        };
+
+        Event.prototype.innerHeight = function() {
+            if ('innerHeight' in window) {
+
+                return window.innerHeight;
+
+            } else {
+
+                return document.documentElement.clientHeight;
+            }
+        };
+
+        return Event;
+
+    })();
+
+    return {
+        
+        load: function(api) {
+
+            api.dom.Event = new Event();
+        },
+        unload: function() {}
+    };
+});
+;/* --------------------------------------- *
+* Guerrilla UI                             *
+* @module: MVC Model object class          * 
+* ----------------------------y------------ */
+$.GUI().use(function(gui) {
 
     Model = (function(superClass) {
 
-        // extend model object with superClass properties
+        // extend model prototype with superClass properties
         utils.extend(Model, superClass);
 
         function Model(obj) {
@@ -1893,6 +2102,7 @@ $.GUI().use(function(G) {
                         for (k in key) {
 
                             v = key[k];
+
                             this.set(k, v, true);
                         }
 
@@ -1974,11 +2184,22 @@ $.GUI().use(function(G) {
             }
         };
 
+        /** 
+         * Fire the Modal change event  
+         *
+         * @return {function} 
+        **/
         Model.prototype.notify = function() {
 
             return this.change();
         };
 
+        /** 
+         * Retreive property of current model object 
+         *
+         * @param key {string} - property to search model object for
+         * @return {various} - whateve value the found property holds 
+        **/
         Model.prototype.get = function(key) {
 
             return this[key];
@@ -2001,58 +2222,62 @@ $.GUI().use(function(G) {
             return json;
         };
 
+        /* The model change event identifier */
         Model.CHANGED = "changed";
 
         return Model;
 
-    })(G.Broker);
+    })(gui.Broker);
 
     return {
         load: function(api) {
-            // extend api
-            api.Model = Model;
-        }
+
+           api.model = Model;
+        },
+        unload: function() {}
     };
 });
 ;/* --------------------------------------- *
 * Guerrilla UI                             *
 * @module: MVC View object class           * 
 * ---------------------------------------- */
-$.GUI().use(function(G) {
-    var plugin, View;
+$.GUI().use(function(gui) {
+    var View;
 
     View = (function() {
 
         function View(model) {
 
             if (model) {
-                return this.setModel(model);
+                this.setModel(model);
             }
-      
-            this.setModel = function(obj) {
-                this.model = obj;
+        } 
 
-                return this.model.change((function() {
+        View.prototype.setModel = function(obj) {
+            this.model = obj;
 
-                    return this.render();
+            return this.model.change((function() {
 
-                }), this);
-            };
+                return this.render();
 
-            this.render = function() {
-                console.log('Render method called in View.');
-            };
-        }
+            }), this);
+        };
+
+        View.prototype.render = function() {
+            console.log('Render Template :: ', this);
+        };
 
         return View;
 
     })();
 
     return {
-        load: function(sandbox) {
-            sandbox.View = View;
+
+        load: function(api) {
+
+            api.view = View;
         },
-        unload: function(){}
+        unload: function() {}
     };
 });
 ;/* --------------------------------------- *
@@ -2060,7 +2285,7 @@ $.GUI().use(function(G) {
 * @author: Garrett Haptonstall (FearDread) *
 * @module: MVC Controller class module     * 
 * ---------------------------------------- */
-$.GUI().create('Controller', function(G) {
+$.GUI().create('Controller', function(gui) {
     var Controller;
 
     Controller = (function() {
@@ -2076,15 +2301,10 @@ $.GUI().create('Controller', function(G) {
 
     })();
 
-    GUI.Model = Model;
-
-    GUI.View = View;
-
-    GUI.Controller = Controller;
-
     return {
-        load: function() {
-            console.log('Controller class :: ', Controller);
+        load: function(api) {
+
+          api.controller = Controller;
         },
         unload: function() {}
     };
@@ -2095,7 +2315,7 @@ $.GUI().create('Controller', function(G) {
 * ---------------------------------------- */
 $.GUI().use(function(G) {
 
-    function Router(sb) {
+    function Router() {
 
         return {
             routes: [],
@@ -2241,13 +2461,679 @@ $.GUI().use(function(G) {
         };
     }
 
-
     function _load(api) {
-        api.Router = new Router(api);
+        api.net.router = new Router();
     }
 
     return {
         load: _load
+    };
+});
+;/* --------------------------------------- *
+* Guerrilla JS                             *
+* @module: Dynamic media query callbacks   *
+* ---------------------------------------- */
+$.GUI().use(function(G) {
+
+    return {
+        
+        load: function(api) {
+            var Media;
+
+            Media = function(options) {
+                var _this = this.prototype, breaks, change, listen, matches, prototype,
+                    hasMatch = window.mediaMatches !== undefined && !!window.mediaMatches('!').listen;
+
+                prototype = {
+
+                    /**
+                     * Event handler that checks and fires callbacks based on passed media query 
+                     *
+                     * @param query {string} - the media query to execute on
+                     * @param options {object} - options object with media callbacks 
+                     * @return {function} - execute callbacks 
+                    **/
+                    change: function(query, options) {
+                        if (query.matches) {
+
+                            if (api.utils.isFunc(options.in)) {
+                                options.in(query);
+                            }
+                        } else {
+                    
+                            if (api.utils.isFunc(options.out)) {
+                                options.out(query);
+                            }
+                        }
+
+                        if (api.utils.isFunc(options.both)) {
+                            return options.both(query);
+                        }
+                    }, 
+
+                    /**
+                     * Add media listener to query and window orientation events 
+                     *
+                     * @param options {object} - options object with media queries 
+                     * @return {function} - execute change event 
+                    **/
+                    listen: function(options) {
+                        var _this = this, query, query_cb, window_cb;
+
+                        query = window.mediaMatches(options.media);
+
+                        query_cb = function() {
+                            return _this.change(query, options);
+                        };
+
+                        window_cb = function() {
+                            return _this.change(window.matches(options.media), options);
+                        };
+
+                        query.addListener(query_cb);
+
+                        window.addEventListener("orientationchange", window_cb, false);
+
+                        return this.change(query, options);
+                    },
+
+                    /**
+                     * Check media query parts dimentions and height / width 
+                     *
+                     * @param parts {object} the media query object to check 
+                     * @return {string} - matched query string 
+                    **/
+                    check: function(parts) {
+                        var constraint, dimension, matches, ratio, value, windowHeight, windowWidth;
+
+                        constraint = parts[1];
+                        dimension = parts[2];
+
+                        if (parts[4]) {
+
+                            value = api.utils.getPxValue(parseInt(parts[3], 10), parts[4]); 
+
+                        } else {
+                            value = parts[3];
+                        }
+
+                        windowWidth = window.innerWidth || document.documentElement.clientWidth;
+                        windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+                        if (dimension === 'width') {
+
+                            matches = constraint === "max" && value > windowWidth || constraint === "min" && value < windowWidth;
+
+                        } else if (dimension === 'height') {
+
+                            matches = constraint === "max" && value > windowHeight || constraint === "min" && value < windowHeight;
+                        } else if (dimension === 'aspect-ratio') {
+                            ratio = windowWidth / windowHeight;
+                            // matches = constraint === "max" && JSON.parse(ratio) < JSON.parse(value) || constraint === "min" && JSON.parse(ratio) > JSON.parse(value);
+                            matches = constraint === "max" && JSON.parse(ratio) < JSON.parse(value) || constraint === "min" && JSON.parse(ratio) > JSON.parse(value);
+                        }
+
+                        return matches;
+                    },
+
+                    /**
+                     * Attach event listener for changes in media / screen size 
+                     *
+                     * @return {object} - the added event object via change method 
+                    **/
+                    mediaListener: function() {
+                        var opts, matches, media, medias, parts, _i, _len;
+
+                        medias = (options.media) ? options.media.split(/\sand\s|,\s/) : null;
+
+                        if (medias) {
+                            matches = true;
+
+                            for (_i = 0, _len = medias.length; _i < _len; _i++) {
+                                media = medias[_i];
+                                parts = media.match(/\((.*?)-(.*?):\s([\d\/]*)(\w*)\)/);
+
+                                if (!prototype.check(parts)) {
+                                    matches = false;
+                                }
+                            }
+
+                            opts = {media: options.media, matches: matches};
+
+                            return prototype.change(opts, options);
+                        }
+                    }
+                };
+
+                /* Return all needed event listeners */
+                return function() {
+
+                    if (window.mediaMatches) {
+
+                        return prototype.listen();
+                    
+                    } else {
+                        if (window.addEventListener) {
+                            window.addEventListener("resize", prototype.mediaListener);
+
+                        } else {
+
+                            if (window.attachEvent) {
+                                window.attachEvent("onresize", prototype.mediaListener);
+                            }
+                        }
+
+                        return prototype.mediaListener();
+                    }
+                };
+            };
+
+            // Add to sandbox ui namespace
+            api.ui.media = Media;
+        }
+    };
+});
+;/* ----------------------api----------------- *
+* Guerrilla UI                             *
+* @module: Charm, timed animations based   * 
+* on scrolling and page location           *
+* ---------------------------------------- */
+$.GUI().use(function(gui) {
+ 
+    return {
+
+        load: function(api) {
+            var Charm;
+
+            Charm = (function() {
+
+                function Charm(options) {
+
+                    if (!options || options === null) {
+                        options = {};
+                    }
+
+                    this.start = api.broker.bind(this.start, this);
+                    this.scrollHandler = api.broker.bind(this.scrollHandler, this);
+                    this.scrollCallback = api.broker.bind(this.scrollCallback, this);
+                    this.resetAnimation = api.broker.bind(this.resetAnimation, this);
+
+                    this.config = api.utils.merge(options, this.defaults);
+                    this.charmEvent = this.Event.create(this.config.boxClass);
+
+                    this.animationNameCache = api.dom.map;
+                    this.scrolled = true;
+                }
+
+                Charm.prototype.defaults = {
+                    boxClass: 'charm',
+                    animateClass: 'animated',
+                    offset: 0,
+                    mobile: true,
+                    live: true,
+                    callback: null
+                };
+
+                Charm.prototype.vendors = ["moz", "webkit"];
+
+                Charm.prototype.Event = api.dom.Event;
+                
+                /*
+                function() {
+                    return (this._event !== null) ? this._event : this._event = api.dom.event;
+                };
+                */
+
+                Charm.prototype.disabled = function() {
+                    return !this.config.mobile && this.event.isMobile(navigator.userAgent);
+                };
+
+                Charm.prototype.init = function() {
+                    var ref;
+
+                    this.element = document.documentElement;
+
+                    if ((ref = document.readyState) === "interactive" || ref === "complete") {
+
+                        this.start();
+
+                    } else {
+
+                        this.Event.add(document, 'DOMContentLoaded', this.start);
+                    }
+
+                    this.finished = [];
+
+                    return this.finished;
+                };
+
+                Charm.prototype.start = function() {
+                    var _this = this, box, j, length, _ref;
+
+                    this.stopped = false;
+
+                    this.boxes = (function() {
+                        var i = 0, length, _ref, results = [];
+
+                        _ref = this.element.querySelectorAll("." + this.config.boxClass);
+
+                        length = _ref.length;
+
+                        if (length > 0) {
+
+                            do {
+                                box = _ref[i];
+
+                                results.push(box);
+
+                                i++;
+                            } while (--length);
+                        }
+
+                        return results;
+
+                    }).call(this);
+
+                    this.all = (function() {
+                        var j, len, ref, results;
+
+                        ref = this.boxes;
+                        results = [];
+
+                        for (j = 0, len = ref.length; j < len; j++) {
+                          box = ref[j];
+                          results.push(box);
+                        }
+
+                        return results;
+
+                    }).call(this);
+
+                    if(this.boxes.length){
+
+                        if(this.disabled()){
+
+                            this.resetStyle();
+
+                        }else{
+                            ref = this.boxes;
+
+                            for(j = 0, length = ref.length; j < length; j++){
+                                box = ref[j];
+                                this.applyStyle(box, true);
+                            }
+                        }
+                    }
+
+                    if (!this.disabled()) {
+                        this.Event.add(window, 'scroll', this.scrollHandler);
+                        this.Event.add(window, 'resize', this.scrollHandler);
+
+                        this.interval = window.setInterval(this.scrollCallback, 50);
+                    }
+
+                    if (this.config.live) {
+
+                        return new MutationObserver((function(_this) {
+                            return function(records) {
+                                var i = 0, length, node, record, results = [];
+
+                                for (length = records.length; i < length; i++) {
+                                    record = records[i];
+
+                                    results.push((function() {
+                                        var l, len2, ref1, results1;
+
+                                        ref1 = record.addedNodes || [];
+                                        results1 = [];
+
+                                        for(l = 0, len2 = ref1.length; l < len2; l++){
+                                            node = ref1[l];
+                                            results1.push(this.doSync(node));
+                                        }
+
+                                        return results1;
+
+                                    }).call(_this));
+                                }
+
+                                return results;
+                            };
+                        })(this)).observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                    }
+                };
+
+                Charm.prototype.stop = function() {
+                    this.stopped = true;
+
+                    this.event.remove(window, 'scroll', this.scrollHandler);
+                    this.event.remove(window, 'resize', this.scrollHandler);
+
+                    if (this.interval != null) {
+                        return window.clearInterval(this.interval);
+                    }
+                };
+
+                /**
+                 * Check for MutationObserver support
+                 *
+                 * @param element {object} - dom element object
+                 * @return sync {function} - attempt to sync with dom element
+                **/
+                Charm.prototype.sync = function(element) {
+                    if (MutationObserver.notSupported) {
+                        return this.doSync(this.element);
+                    }
+                };
+
+                Charm.prototype.doSync = function(element) {
+                    var box, i = 0, length, ref, results = [];
+
+                    if (element == null) {
+                        element = this.element;
+                    }
+
+                    if (element.nodeType !== 1) {
+                        return;
+                    }
+
+                    element = element.parentNode || element;
+                    ref = element.querySelectorAll("." + this.config.boxClass);
+
+                    for (length = ref.length; i < length; i++) {
+                        box = ref[i];
+
+                        if (indexOf.call(this.all, box) < 0) {
+                            this.boxes.push(box);
+                            this.all.push(box);
+
+                            if (this.stopped || this.disabled()) {
+                                this.resetStyle();
+                            } else {
+                                this.applyStyle(box, true);
+                            }
+
+                            results.push(this.scrolled = true);
+
+                        } else {
+
+                            results.push(void 0);
+                        }
+                    }
+
+                    return results;
+                };
+
+                /**
+                 * Add needed show events to reset animations 
+                 *
+                 * @param box {object} - the box element with animation props 
+                 * @return box {object} - updated box element with added events 
+                **/
+                Charm.prototype.show = function(box) {
+                    this.applyStyle(box);
+
+                    box.className = box.className + " " + this.config.animateClass;
+
+                    if (this.config.callback != null) {
+                        this.config.callback(box);
+                    }
+
+                    this.Event.fire(box, this.charmEvent);
+
+                    this.Event.add(box, 'animationend', this.resetAnimation);
+                    this.Event.add(box, 'oanimationend', this.resetAnimation);
+                    this.Event.add(box, 'webkitAnimationEnd', this.resetAnimation);
+                    this.Event.add(box, 'MSAnimationEnd', this.resetAnimation);
+
+                    return box;
+                };
+
+                Charm.prototype.applyStyle = function(box, hidden) {
+                    var delay, duration, iteration;
+
+                    duration = box.getAttribute('data-charm-duration');
+                    delay = box.getAttribute('data-charm-delay');
+                    iteration = box.getAttribute('data-charm-iteration');
+
+                    return this.animate((function(_this) {
+
+                        return function() {
+                            return _this.customStyle(box, hidden, duration, delay, iteration);
+                        };
+                    })(this));
+                };
+
+                Charm.prototype.animate = (function() {
+                    if ('requestAnimationFrame' in window) {
+                        return function(callback) {
+                            return window.requestAnimationFrame(callback);
+                        };
+
+                    } else {
+                        return function(callback) {
+                            return callback();
+                        };
+                    }
+                })();
+
+                Charm.prototype.resetStyle = function() {
+                    var box, i = 0, length, ref, results = [];
+
+                    ref = this.boxes;
+
+                    for (length = ref.length; i < length; i++) {
+                        box = ref[i];
+                        results.push(box.style.visibility = 'visible');
+                    }
+
+                    return results;
+                };
+
+                Charm.prototype.resetAnimation = function(event) {
+                    var target;
+
+                    if (event.type.toLowerCase().indexOf('animationend') >= 0) {
+                        target = event.target || event.srcElement;
+
+                        return target.className = target.className.replace(this.config.animateClass, '').trim();
+                    }
+                };
+
+                Charm.prototype.customStyle = function(box, hidden, duration, delay, iteration) {
+                    if (hidden) {
+                        this.cacheAnimationName(box);
+                    }
+
+                    box.style.visibility = hidden ? 'hidden' : 'visible';
+
+                    if (duration) {
+                        this.vendorSet(box.style, {
+                            animationDuration: duration
+                        });
+                    }
+
+                    if (delay) {
+                        this.vendorSet(box.style, {
+                            animationDelay: delay
+                        });
+                    }
+
+                    if (iteration) {
+                        this.vendorSet(box.style, {
+                            animationIterationCount: iteration
+                        });
+                    }
+
+                    this.vendorSet(box.style, {
+                        animationName: hidden ? 'none' : this.cachedAnimationName(box)
+                    });
+
+                    return box;
+                };
+
+                Charm.prototype.vendorSet = function(elem, properties) {
+                    var name, results = [], value, vendor;
+
+                    for (name in properties) {
+                        value = properties[name];
+                        elem["" + name] = value;
+
+                        results.push((function() {
+                            var i, ref, results1;
+
+                            ref = this.vendors;
+                            results1 = [];
+
+                            for (i = 0; i < ref.length; i++) {
+
+                                vendor = ref[i];
+                                results1.push(elem["" + vendor + (name.charAt(0).toUpperCase()) + (name.substr(1))] = value);
+                            }
+
+                            return results1;
+
+                        }).call(this));
+                    }
+
+                    return results;
+                };
+
+                Charm.prototype.vendorCSS = function(elem, property) {
+                    var i = 0, length, ref, result, style, vendor;
+
+                    style = window.getComputedStyle(elem);
+                    result = style.getPropertyCSSValue(property);
+
+                    ref = this.vendors;
+
+                    for (length = ref.length; i < len; i++) {
+                        vendor = ref[i];
+                        result = result || style.getPropertyCSSValue("-" + vendor + "-" + property);
+                    }
+
+                    return result;
+                };
+
+                Charm.prototype.animationName = function(box) {
+                    var animationName;
+
+                    try {
+
+                        animationName = this.vendorCSS(box, 'animation-name').cssText;
+
+                    } catch (_error) {
+
+                        animationName = window.getComputedStyle(box).getPropertyValue('animation-name');
+                    }
+
+                    if (animationName === 'none') {
+
+                        return '';
+
+                    } else {
+
+                        return animationName;
+                    }
+                };
+
+                Charm.prototype.cacheAnimationName = function(box) {
+                    return this.animationNameCache.set(box, this.animationName(box));
+                };
+
+                Charm.prototype.cachedAnimationName = function(box) {
+                    return this.animationNameCache.get(box);
+                };
+
+                Charm.prototype.scrollHandler = function() {
+                    this.scrolled = true;
+
+                    return this.scrolled;
+                };
+
+                Charm.prototype.scrollCallback = function() {
+                    var box;
+
+                    if (this.scrolled) {
+                        this.scrolled = false;
+                        this.boxes = (function() {
+                            var i = 0, lenth, ref, results = [];
+
+                            ref = this.boxes;
+                            length = ref.length;
+                            
+                            if (length > 0) {
+
+                                do {
+                                    box = ref[i];
+
+                                    if (!(box)) {
+                                        continue;
+                                    }
+                                    if (this.isVisible(box)) {
+                                        this.show(box);
+                                        continue;
+                                    }
+
+                                    results.push(box);
+                                    i++;
+
+                                } while (--length);
+                            }
+
+                            return results;
+
+                        }).call(this);
+
+                        if (!(this.boxes.length || this.config.live)) {
+
+                            return this.stop();
+                        }
+                    }
+                };
+
+                Charm.prototype.offsetTop = function(element) {
+                    var top;
+
+                    while (element.offsetTop === void 0) {
+
+                        element = element.parentNode;
+                    }
+
+                    top = element.offsetTop;
+
+                    while (element == element.offsetParent) {
+
+                        top += element.offsetTop;
+                    }
+
+                    return top;
+                };
+
+                Charm.prototype.isVisible = function(box) {
+                    var bottom, offset, top, viewBottom, viewTop;
+
+                    offset = box.getAttribute('data-wow-offset') || this.config.offset;
+
+                    viewTop = window.pageYOffset;
+                    viewBottom = viewTop + Math.min(this.element.clientHeight, this.Event.innerHeight()) - offset;
+
+                    top = this.offsetTop(box);
+                    bottom = top + box.clientHeight;
+
+                    return top <= viewBottom && bottom >= viewTop;
+                };
+
+                return Charm;
+
+            })();
+
+            api.ui.charm = Charm;
+        },
+        unload: function() {}
     };
 });
 ;/* --------------------------------------- *
@@ -2736,6 +3622,29 @@ $.GUI().use(function(G) {
                         }, context || this), time);
                     };
                 },
+                
+                /**
+                 * Allow passed method to only be executed only once
+                 *
+                 * @param fn {function} - the function to execute once
+                 * @param context {object} - optional context that will be applied to passed method
+                 * @return {function}
+                **/
+                once: function(fn, context) {
+                    var result;
+                    
+                    return function() {
+                        
+                        if (fn) {
+                        
+                            result = fn.apply(context || this, arguments);
+                            
+                            fn = null;
+                        }
+                        
+                        return result;
+                    };
+                },
 
                 /**
                  * Delay a functions execution by passed amount of time 
@@ -2747,6 +3656,8 @@ $.GUI().use(function(G) {
                 **/
                 throttle: function(fn, time, context) {
                     var run;
+                    
+                    time = time || 1000;
 
                     return function() {
                         var args = arguments,
@@ -2784,143 +3695,10 @@ $.GUI().use(function(G) {
 });
 ;/* --------------------------------------- *
 * Guerrilla UI                             *
-* @module: Custom cookie api object        *
-* ---------------------------------------- */
-$.GUI().use(function(G) {
-
-    function _load(api) {
-
-        api.cookie = {
-
-            has:function(cname){
-                if (!cname) { 
-                    return false; 
-                }
-
-                return (
-
-                    new RegExp("(?:^|;\\s*)" + api.Lang.encode(cname).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")
-
-                ).test(document.cookie);
-            },
-
-            get: function(cname) {
-                if (!cname) { 
-                    return null; 
-                }
-
-                return api.Lang.decode(document.cookie.replace(
-
-                    new RegExp("(?:(?:^|.*;)\\s*" + api.Lang.encode(cname).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")
-
-                ) || null;
-            },
-
-            set: function(cname, cvalue, opts) {
-                var params = arguments;
-
-                if (params.length > 1 && !api.utils.isFunc(cval)) {
-                    options = api.utils.merge({}, opts); 
-              
-                    if ((typeof options.expires) === 'number') {
-                        var days = options.expires, 
-                            time = options.expires = new Date();
-
-                        time.setMilliseconds(
-                            time.getMilliseconds() + days * 864e+5
-                        );
-                    }
-                }
-
-                document.cookie = [
-                    api.Lang.encode(cname), '=', api.Lang.encode(cvalue),
-                    (options.expires) ? '; expires=' + options.expires.toUTCString() : '',
-                    (options.path) ? '; path=' + options.path : '', 
-                    (options.domain) ? '; domain=' + options.domain : '',
-                    (options.secure) ? '; secure=' + options.secure : '' 
-                ].join('');
-
-                G.log('set cookie ::', document.cookie);
-
-                return true;
-            },
-            
-            remove: function(cname, cpath, cdomain){
-                if (!this.has(cname)) { 
-                    return false; 
-                }
-
-                document.cookie = api.Lang.encode(cname) +
-                    "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" +
-                    (cdomain) ? "; domain=" + cdomain : "" +
-                    (cpath) ? "; path=" + cpath : "";
-
-                return true;
-            },
-
-            list: function() {
-                var index = 0,
-                    regex = /((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, 
-                    keys = document.cookie.replace(regex, '').split(/\s*(?:\=[^;]*)?;\s*/),
-                    length = keys.length;
-
-                while(--length){
-                    keys[index] = api.Lang.decode(keys[index]); 
-
-                    index++;
-                }
-
-                return keys;
-            },
-
-            once:function(){
-                var values, 
-                    params = arguments, 
-                    callback = params[0], 
-                    argc = params.length, 
-                    cname = params[argc - 3],
-                    expires = params[argc - 1],
-                    glob = (typeof params[argc - 2] === "string");
-
-                if(glob){ 
-                    argc++; 
-                }
-
-                if(argc < 3){ 
-                    throw new TypeError("guerrilla.core.once - not enough arguments"); 
-
-                }else if(!api.utils.isFunc(func)) { 
-                    throw new TypeError("guerrilla.core.once - first argument must be a function"); 
-
-                }else if(!cname || /^(?:expires|max\-age|path|domain|secure)$/i.test(cname)){ 
-                    throw new TypeError("guerrilla.core.once - invalid identifier");
-                }
-
-                if(this.has(cname)){
-                    return false;
-                }
-
-                values = (argc > 3) ? params[1] : null || (argc > 4) ? [].slice.call(params, 2, argc - 2) : [];
-
-                func.apply(values);
-
-                this.set(cname, 1, expires || 'Fri, 31 Dec 9999', '/', false);
-
-                return true;
-            }
-        };
-    }
-
-    return {
-        load: _load
-    };
-});
-;/* --------------------------------------- *
-* Guerrilla UI                             *
 * @module: Cellar, handle local & session  * 
 * storage api's                            *
 * ---------------------------------------- */
-$.GUI().use(function(G) {
+$.GUI().use(function(gui) {
 
     /* Private methods */
     /**
@@ -3439,39 +4217,172 @@ $.GUI().use(function(G) {
 });
 ;/* --------------------------------------- *
 * Guerrilla UI                             *
+* @module: Custom cookie api object        *
+* ---------------------------------------- */
+$.GUI().use(function(G) {
+
+    function _load(api) {
+
+        api.cookie = {
+
+            has:function(cname){
+                if (!cname) { 
+                    return false; 
+                }
+
+                return (
+
+                    new RegExp("(?:^|;\\s*)" + api.Lang.encode(cname).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")
+
+                ).test(document.cookie);
+            },
+
+            get: function(cname) {
+                if (!cname) { 
+                    return null; 
+                }
+
+                return api.Lang.decode(document.cookie.replace(
+
+                    new RegExp("(?:(?:^|.*;)\\s*" + api.Lang.encode(cname).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")
+
+                ) || null;
+            },
+
+            set: function(cname, cvalue, opts) {
+                var params = arguments;
+
+                if (params.length > 1 && !api.utils.isFunc(cval)) {
+                    options = api.utils.merge({}, opts); 
+              
+                    if ((typeof options.expires) === 'number') {
+                        var days = options.expires, 
+                            time = options.expires = new Date();
+
+                        time.setMilliseconds(
+                            time.getMilliseconds() + days * 864e+5
+                        );
+                    }
+                }
+
+                document.cookie = [
+                    api.Lang.encode(cname), '=', api.Lang.encode(cvalue),
+                    (options.expires) ? '; expires=' + options.expires.toUTCString() : '',
+                    (options.path) ? '; path=' + options.path : '', 
+                    (options.domain) ? '; domain=' + options.domain : '',
+                    (options.secure) ? '; secure=' + options.secure : '' 
+                ].join('');
+
+                G.log('set cookie ::', document.cookie);
+
+                return true;
+            },
+            
+            remove: function(cname, cpath, cdomain){
+                if (!this.has(cname)) { 
+                    return false; 
+                }
+
+                document.cookie = api.Lang.encode(cname) +
+                    "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" +
+                    (cdomain) ? "; domain=" + cdomain : "" +
+                    (cpath) ? "; path=" + cpath : "";
+
+                return true;
+            },
+
+            list: function() {
+                var index = 0,
+                    regex = /((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, 
+                    keys = document.cookie.replace(regex, '').split(/\s*(?:\=[^;]*)?;\s*/),
+                    length = keys.length;
+
+                while(--length){
+                    keys[index] = api.Lang.decode(keys[index]); 
+
+                    index++;
+                }
+
+                return keys;
+            },
+
+            once:function(){
+                var values, 
+                    params = arguments, 
+                    callback = params[0], 
+                    argc = params.length, 
+                    cname = params[argc - 3],
+                    expires = params[argc - 1],
+                    glob = (typeof params[argc - 2] === "string");
+
+                if(glob){ 
+                    argc++; 
+                }
+
+                if(argc < 3){ 
+                    throw new TypeError("guerrilla.core.once - not enough arguments"); 
+
+                }else if(!api.utils.isFunc(func)) { 
+                    throw new TypeError("guerrilla.core.once - first argument must be a function"); 
+
+                }else if(!cname || /^(?:expires|max\-age|path|domain|secure)$/i.test(cname)){ 
+                    throw new TypeError("guerrilla.core.once - invalid identifier");
+                }
+
+                if(this.has(cname)){
+                    return false;
+                }
+
+                values = (argc > 3) ? params[1] : null || (argc > 4) ? [].slice.call(params, 2, argc - 2) : [];
+
+                func.apply(values);
+
+                this.set(cname, 1, expires || 'Fri, 31 Dec 9999', '/', false);
+
+                return true;
+            }
+        };
+    }
+
+    return {
+        load: _load
+    };
+});
+;/* --------------------------------------- *
+* Guerrilla UI                             *
 * @module: GUI Layer Slider jQuery plugin  * 
 * ---------------------------------------- */
-$.GUI().create('Glisslider', function(G) {
+$.GUI().create('LayerSlider', function(G) {
 
-    var Glisslider = function($el, opts) {
+    var Layers = function($el, opts) {
         var _this = this, slider = $el;
         
         // default options
         this.defaults = {
-            debug:false,
-            text:null,
-            style:'random',
-            brand:null,
-            image:null,
-            showing:{
-                extra:null,
-                slider:true
+            debug: false,
+            text: null,
+            style: 'random',
+            brand: null,
+            image: null,
+            showing: {
+                extra: null,
+                slider: true
             },
-            focused:true,
-            collection:[],
-            animating:true,
-            capTime:1500,
-            brandTime:1500,
-            layerTime:1200,
-            slideTime:6500,
-            animationTime:1500,
-            slide:null,
-            start:function(){},
-            stop:function(){},
-            pause:function(){},
-            canvas:null,
-            container:$('#glisslider'),
-            selector:$('.slides > li'),
+            focused: true,
+            collection: [],
+            animating: true,
+            capTime: 1500,
+            brandTime: 1500,
+            layerTime: 1200,
+            slideTime: 6500,
+            animationTime: 1500,
+            slide: null,
+            start: function(){},
+            stop: function(){},
+            pause: function(){},
+            canvas: null,
+            container: $('#layerslider'),
+            selector: $('.slides > li'),
         };
 
         // Public Properties //
@@ -3491,7 +4402,7 @@ $.GUI().create('Glisslider', function(G) {
         };
 
         // Store Reference //
-        $.data($el, 'Glisslider', slider);
+        $.data($el, 'LayerSlider', slider);
 
         // Private Methods //
         this.methods = {
@@ -3545,15 +4456,12 @@ $.GUI().create('Glisslider', function(G) {
                         current.children('div').css('display','none');
 
                         next.addClass('active');
-
                         _this.animate(next, slider.animations.fade[rand]);
                         break;
                         
                     case 'fade':
                         current.fadeOut(500).removeClass('active');
-
                         next.fadeIn(500).addClass('active');
-
                         break;
 
                     case 'slide':
@@ -3561,6 +4469,7 @@ $.GUI().create('Glisslider', function(G) {
 
                         current.removeClass('active');
                         current.animate({
+
                             left: - slider.slideWidth
 
                         }, 200, function() {
@@ -3574,155 +4483,189 @@ $.GUI().create('Glisslider', function(G) {
                         break;
                 }
             },
-          slide_prev:function(){
-            var _this = this, current = $('.item.active', slider),
-                prev = current.previous().length ? current.previous() : current.siblings().last(),
-                rand = Math.floor(Math.random() * (9 - 0) + 0);
 
-            switch(slider.opts.style){
-              case 'random':
-                current.css('display','none').removeClass('active');
-                current.children('div').css('display','none');
-                prev.addClass('active');
-                _this.animate(prev, slider.animations.fade[rand]);
-                break;
-              case 'fade':
-                current.fadeOut(500).removeClass('active');
-                prev.fadeIn(500).addClass('active');
-                break;
-              case 'slide':
-                slider.opts.selector.animate({
-                  left: + slider.slideWidth
-                  },400,function(){
-                    $('.slides li:last-child').prependTo('.slides');
-                    $('.slides').css('left', '0');
-                });
-                break;
-              default:
-                break;
-            }
-          },
-          layer:function(item){
-            var _this = this;
-            var rand = Math.floor(Math.random() * (5 - 0) + 0);
-            var caption = item.find('.caption'), brand = item.find('.brand'); 
+            slide_prev: function() {
+                var _this = this, current = $('.item.active', slider),
+                    prev = current.previous().length ? current.previous() : current.siblings().last(),
+                    rand = Math.floor(Math.random() * (9 - 0) + 0);
 
-            _this.animate(item, 'fadeIn', 500);
-            $(slider).trigger('slide');
+                switch (slider.opts.style) {
+                    case 'random':
+                        current.css('display','none').removeClass('active');
+                        current.children('div').css('display','none');
 
-            setTimeout(function(){
-              brand.show();
-              _this.animate(brand,
-                slider.animations.rotate[rand], slider.opts.brandTime);
+                        prev.addClass('active');
+                        _this.animate(prev, slider.animations.fade[rand]);
+                        break;
 
-                setTimeout(function(){
-                  caption.show();
-                  _this.animate(caption,
-                    slider.animations.texts[rand], slider.opts.capTime);
+                    case 'fade':
+                        current.fadeOut(500).removeClass('active');
+                        prev.fadeIn(500).addClass('active');
+                        break;
 
-              }, slider.opts.layerTime);
-            }, slider.opts.layerTime);
-          },
-          cycle:function(){
-            var _this = this, item;
-            var len = slider.data.length;
-            item = $(slider.data[this.activeIndex]);
+                    case 'slide':
+                        slider.opts.selector.animate({
 
-            if(this.activeIndex < len && slider.opts.animating){
-              this.layer(item);
+                            left: + slider.slideWidth
 
-              setTimeout(function(){
-                _this.slide_next();
-                _this.cycle(); 
+                        }, 400, function(){
 
-              }, slider.opts.slideTime);
-            }else if(slider.opts.animating){
-              this.reset();
-              item = $(slider.data[this.activeIndex]);
+                            $('.slides li:last-child').prependTo('.slides');
+                            $('.slides').css('left', '0');
+                        });
+                        break;
 
-              this.layer(item);
-              setTimeout(function(){
-                _this.slide_next();
-                _this.cycle(); 
+                    default:
+                        break;
+                }
+            },
 
-              }, slider.opts.slideTime);
-            }
-          },
-          bind_events:function(){
-            var _this = this;
-            // Custom Events //
-            $(slider).bind('slide',function(_e){
-              _e.stopPropagation();
-              if(slider.opts.slide !== null){
-                if(typeof(slider.opts.slide) === 'function'){
+            layer: function(item) {
+                var _this = this, rand, caption, brand;
+
+                rand = Math.floor(Math.random() * (5 - 0) + 0);
+
+                brand = item.find('.brand');
+                caption = item.find('.caption');
+
+                this.animate(item, 'fadeIn', 500);
+
+                $(slider).trigger('slide');
+
+                setTimeout(function() {
+                    brand.show();
+
+                    _this.animate(
+                        brand,
+                        slider.animations.rotate[rand], 
+                        slider.opts.brandTime
+                    );
+
+                    setTimeout(function() {
+                        caption.show();
+
+                        _this.animate(
+                            caption,
+                            slider.animations.texts[rand], 
+                            slider.opts.capTime
+                        );
+
+                    }, slider.opts.layerTime);
+
+                }, slider.opts.layerTime);
+            },
+
+            cycle: function() {
+                var _this = this, length, item;
+            
+                length = slider.data.length;
+                item = $(slider.data[this.activeIndex]);
+
+                if (this.activeIndex < len && slider.opts.animating) {
+                    this.layer(item);
+
+                    setTimeout(function() {
+
+                        _this.slide_next();
+                        _this.cycle(); 
+
+                    }, slider.opts.slideTime);
+
+                } else if (slider.opts.animating) {
+
+                    this.reset();
+                    item = $(slider.data[this.activeIndex]);
+
+                    this.layer(item);
+
+                    setTimeout(function() {
+
+                        _this.slide_next();
+                        _this.cycle(); 
+
+                    }, slider.opts.slideTime);
+                }
+            },
+
+            bind_events: function() {
+                var _this = this;
+
+                // Custom Events //
+                $(slider).bind('slide', function(_e) {
+                    _e.stopPropagation();
+
+                    if (slider.opts.slide !== null) {
+                        if (typeof(slider.opts.slide) === 'function') {
                 
-                  slider.opts.slide();
-                }
-              }else{
-                if(slider.opts.showing.extra){
-                  $(slider.opts.showing.extra).show('slow');
-                }
-              }
-            });
-            $(slider).bind('start',function(_e){
-              _e.preventDefault();
-            
-            });
-            $(slider).bind('stop',function(_e){
-              _e.preventDefault();
-            
-            });
+                            slider.opts.slide();
+                        }
+                    } else {
 
-            // Slider Controls //
-            $('.slider-control.right',slider).bind('click',function(_e){
-              _e.preventDefault();
-              _this.slide_next();
-            });
-            $('.slider-control.left',slider).bind('click',function(_e){
-              _e.preventDefault();
-              _this.slide_prev();
-            });
-
-                $(slider.opts.container).hover(function(_e){
-                  _e.stopPropagation();
-                  return;
-                  slider.opts.animating = false;
-                  },function(){
-                    return;
-                    slider.opts.animating = true;
+                        if (slider.opts.showing.extra) {
+                            $(slider.opts.showing.extra).show('slow');
+                        }
+                    }
                 });
+
+                $(slider).bind('start',function(_e) {
+                    _e.preventDefault();
+            
+                });
+
+                $(slider).bind('stop',function(_e) {
+                    _e.preventDefault();
+            
+                });
+
+                // Slider Controls //
+                $('.slider-control.right',slider).bind('click',function(_e) {
+                    _e.preventDefault();
+                    _this.slide_next();
+                });
+
+                $('.slider-control.left',slider).bind('click',function(_e) {
+                    _e.preventDefault();
+                    _this.slide_prev();
+                });
+
+                $(slider.opts.container).hover(function(_e) {
+                    _e.stopPropagation();
+                    slider.opts.animating = false;
+
+                    }, function() {
+                        slider.opts.animating = true;
+                      }
+                  );
+              },
+
+            reset: function() {
+              this.activeIndex = 0;
             },
-            reset:function(){
-                this.activeIndex = 0;
-            },
-            init:function(){
-                console.log('MOSSlider: ', slider.opts);
+
+            init: function() {
+                console.log('Layers: ', slider.opts);
                 // Markup //
                 this.setup();
+
                 // Slideshow Loop //
                 this.cycle();
+
                 // Controls //
                 this.bind_events();
             }
         };
 
         // Default Callbacks //
-        slider.start = function(){
-        
-        };
+        slider.start = function() {};
 
-        slider.stop = function(){
-        
-        };
+        slider.stop = function() {};
 
-        slider.pause = function(){
-        
-        };
+        slider.pause = function() {};
 
-        slider.slide = function(){
-            if(slider.opts.showing.extra){
-                $(slider.opts.showing.extra).show('slow');
-            }
+        slider.slide = function() {
+          if (slider.opts.showing.extra) {
+            $(slider.opts.showing.extra).show('slow');
+          }
         };
 
         slider.slideCount = slider.opts.selector.length;
@@ -3735,7 +4678,7 @@ $.GUI().create('Glisslider', function(G) {
     };
   
     return {
-        fn:function(){
+        fn: function() {
 
         },
     };
