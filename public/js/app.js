@@ -99,9 +99,6 @@ $.GUI().create('App', function(gui) {
                 _this.preload();
                 _this.bindEvents();
 
-                /* temp until background fix */
-                showCaption($('.single-page', $container).eq(0));
-
                 gui.$('.single-page').background({
                     afterLoaded: function() {
                         showCaption($('.single-page', $container).eq(0));
