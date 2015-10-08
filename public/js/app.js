@@ -78,19 +78,20 @@ $.GUI().create('App', function(gui) {
         }
     }
 
-    return {
-        requestAnim: function(value) {
-            return window.requestAnimationFrame(value);
-        },
-        changeOpacity: function() {
-            var newOpacity = 1 - ($('.page-container').scrollTop()) / 300;
+    function requestAnim(value) {
+        return window.requestAnimationFrame(value);
+    }
 
-            $('.page-container .page-scroll').css('opacity', newOpacity);
-            $('.is-full-width .page-title').css('opacity', newOpacity);
-        },
+    function changeOpacity() {
+        var newOpacity = 1 - ($('.page-container').scrollTop()) / 300;
+
+        $('.page-container .page-scroll').css('opacity', newOpacity);
+        $('.is-full-width .page-title').css('opacity', newOpacity);
+    }
+
+    return {
         containerScroll: function() {
-            var _this = this;
-            this.requestAnim(_this.changeOpacity);
+            requestAnim(changeOpacity);
         },
         bindEvents: function() {
             var _this = this;
