@@ -1,7 +1,23 @@
 /* Ghap.com App Module */
 $.GUI().create('App', function(gui) {
-    var $container = gui.$('.page-container');
+    var $container = gui.$('.page-container'), mediaListener;
     gui.log('GUI :: ', gui);
+
+    // dynamic responsive styles
+    mediaListener = new gui.ui.media({
+        media:'(max-width: 1024)',
+        in: function() {
+            console.log('media in');
+        },
+        out: function() {
+            console.log('media out');
+        },
+        both: function() {
+            console.log('media both');
+        }
+    });
+
+    mediaListener();
 
     function scrollTop() {
         $container.animate({
@@ -63,7 +79,7 @@ $.GUI().create('App', function(gui) {
     }
 
     return {
-        request: function(value) {
+        requestAnim: function(value) {
             return window.requestAnimationFrame(value);
         },
         changeOpacity: function() {
@@ -73,7 +89,8 @@ $.GUI().create('App', function(gui) {
             $('.is-full-width .page-title').css('opacity', newOpacity);
         },
         containerScroll: function() {
-            this.request(this.changeOpacity);
+            var _this = this;
+            this.requestAnim(_this.changeOpacity);
         },
         bindEvents: function() {
             var _this = this;
