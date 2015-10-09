@@ -1,15 +1,21 @@
 /* GHAP.com */
 var fs = require('fs');
+var path = require('path');
 var express = require('express');
-var pub = __dirname;
-var app = express();
 var routes = require('./routes');
+var less = require('less-middleware');
 
-app.set('views', __dirname + '/public/views');
+var app = express();
+var pub = __dirname;
 
+app.set('views', pub + '/public/views');
 app.set('view engine', 'jade');
 
-app.use(express.static(__dirname + '/public'));
+app.use(less(path.join(pub, 'src', 'less'), {
+    dest: path.join(pub, '/public')
+}));
+
+app.use(express.static(path.join(pub, '/public')));
 
 routes.addRoutes(app);
 
