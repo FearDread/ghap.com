@@ -107,11 +107,9 @@ $.GUI().create('App', function(gui) {
 
             $('.preloader').delay(300).fadeOut('slow');
             $('body').delay(300);
-
-            new gui.ui.charm().init();
         },
         load: function() {
-            var _this = this;
+            var _this = this, charm;
 
             setTimeout(function(){
                 _this.preload();
@@ -120,6 +118,9 @@ $.GUI().create('App', function(gui) {
                 gui.$('.single-page').background({
                     afterLoaded: function() {
                         showCaption($('.single-page', $container).eq(0));
+
+                        charm = new gui.ui.charm();
+                        charm.init();
                     }
                 });
             }, 1000);
