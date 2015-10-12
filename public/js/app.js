@@ -111,18 +111,19 @@ $.GUI().create('App', function(gui) {
         load: function() {
             var _this = this, charm;
 
-            setTimeout(function(){
+            gui.timeout(function(){
                 _this.preload();
                 _this.bindEvents();
 
                 gui.$('.single-page').background({
                     afterLoaded: function() {
                         showCaption($('.single-page', $container).eq(0));
-
-                        charm = new gui.ui.charm();
-                        charm.init();
                     }
                 });
+
+                charm = new gui.ui.charm();
+                charm.init();
+
             }, 1000);
         },
         unload: function() {}

@@ -1105,6 +1105,22 @@ API = function() {
             this.each = $.each;
 
             /**
+             * Shorthand timeout method 
+             *
+             * @return {function} 
+            **/
+            this.timeout = function(fn, ms) {
+                return window.setTimeout(fn, ms);
+            };
+
+            /**
+             * Shorthand timeout method 
+             *
+             * @return {function} 
+            **/
+            this.interval = window.setInterval;
+
+            /**
              * Reference GUI core log method 
              *
              * @return {function} 
@@ -1191,6 +1207,7 @@ var GUI;
 /** 
  * @todo - add default config that will change behavior of GUI core 
  * @todo - add custom config logic to apply customization options 
+ * @todo - allow async dependency loading to keep framework light - loads modules / plugins only when called via dependency array
  **/
 
 // GUI Core
@@ -1868,18 +1885,18 @@ GUI = (function($) {
 })(jQuery);
 ;/* --------------------------------------- *
 * Guerrilla UI                             *
-* @module: Map, basic key value map store  * 
+* @module: WeakMap, basic key value map store  * 
 * ---------------------------------------- */
 $.GUI().use(function(gui) {
 
-    var Map = window.Map || window.MozMap || (Map = (function() {
+    var WeakMap = this.WeakMap || this.MozWeakMap || (WeakMap = (function() {
 
-        function Map() {
+        function WeakMap() {
             this.keys = [];
             this.values = [];
         }
 
-        Map.prototype.get = function(key) {
+        WeakMap.prototype.get = function(key) {
             var i, item, j, ref;
 
             ref = this.keys;
@@ -1894,7 +1911,7 @@ $.GUI().use(function(gui) {
             }
         };
 
-        Map.prototype.set = function(key, value) {
+        WeakMap.prototype.set = function(key, value) {
             var i, item, j, ref;
 
             ref = this.keys;
@@ -1912,7 +1929,7 @@ $.GUI().use(function(gui) {
             return this.values.push(value);
         };
 
-        return Map;
+        return WeakMap;
 
     })());
 
@@ -1920,7 +1937,7 @@ $.GUI().use(function(gui) {
 
         load: function(api) {
 
-          api.dom.map = new Map();
+          api.dom.map = new WeakMap();
         },
         unload: function() {}
     };
@@ -2064,7 +2081,7 @@ $.GUI().use(function(gui) {
         
         load: function(api) {
 
-            api.dom.event = new Event();
+            api.dom.Event = new Event();
         },
         unload: function() {}
     };
@@ -2645,13 +2662,221 @@ $.GUI().use(function(G) {
         }
     };
 });
-;/* ----------------------api----------------- *
+;
+$.GUI().use(function(gui) {
+
+    return {
+        load: function(api) {
+
+            jQuery.easing.jswing = jQuery.easing.swing;
+
+            api.utils.extend(jQuery.easing, {
+                def: 'easeOutQuad',
+
+                swing: function (x, t, b, c, d) {
+                    return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
+                },
+
+                easeInQuad: function (x, t, b, c, d) {
+                    return c*(t/=d)*t + b;
+                },
+
+                easeOutQuad: function (x, t, b, c, d) {
+                    return -c *(t/=d)*(t-2) + b;
+                },
+
+                easeInOutQuad: function (x, t, b, c, d) {
+                    if ((t/=d/2) < 1) {
+                        return c/2*t*t + b;
+                    }
+                    return -c/2 * ((--t)*(t-2) - 1) + b;
+                },
+
+                easeInCubic: function (x, t, b, c, d) {
+                    return c*(t/=d)*t*t + b;
+                },
+
+                easeOutCubic: function (x, t, b, c, d) {
+                    return c*((t=t/d-1)*t*t + 1) + b;
+                },
+
+                easeInOutCubic: function (x, t, b, c, d) {
+                    if ((t/=d/2) < 1) {
+                        return c/2*t*t*t + b;
+                    }
+                    return c/2*((t-=2)*t*t + 2) + b;
+                },
+
+                easeInQuart: function (x, t, b, c, d) {
+                    return c*(t/=d)*t*t*t + b;
+                },
+
+                easeOutQuart: function (x, t, b, c, d) {
+                    return -c * ((t=t/d-1)*t*t*t - 1) + b;
+                },
+
+                easeInOutQuart: function (x, t, b, c, d) {
+                    if ((t/=d/2) < 1) {
+                        return c/2*t*t*t*t + b;
+                    }
+                    return -c/2 * ((t-=2)*t*t*t - 2) + b;
+                },
+
+                easeInQuint: function (x, t, b, c, d) {
+                    return c*(t/=d)*t*t*t*t + b;
+                },
+
+                easeOutQuint: function (x, t, b, c, d) {
+                    return c*((t=t/d-1)*t*t*t*t + 1) + b;
+                },
+
+                easeInOutQuint: function (x, t, b, c, d) {
+                    if ((t/=d/2) < 1) {
+                        return c/2*t*t*t*t*t + b;
+                    }
+                    return c/2*((t-=2)*t*t*t*t + 2) + b;
+                },
+
+                easeInSine: function (x, t, b, c, d) {
+                    return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
+                },
+
+                easeOutSine: function (x, t, b, c, d) {
+                    return c * Math.sin(t/d * (Math.PI/2)) + b;
+                },
+
+                easeInOutSine: function (x, t, b, c, d) {
+                    return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
+                },
+
+                easeInExpo: function (x, t, b, c, d) {
+                    return (t===0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
+                },
+
+                easeOutExpo: function (x, t, b, c, d) {
+                    return (t===d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
+                },
+
+                easeInOutExpo: function (x, t, b, c, d) {
+                    if (t===0) return b;
+                    if (t===d) return b+c;
+
+                    if ((t/=d/2) < 1) {
+                        return c/2 * Math.pow(2, 10 * (t - 1)) + b;
+                    }
+                    return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
+                },
+
+                easeInCirc: function (x, t, b, c, d) {
+                    return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
+                },
+
+                easeOutCirc: function (x, t, b, c, d) {
+                    return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
+                },
+
+                easeInOutCirc: function (x, t, b, c, d) {
+                    if ((t/=d/2) < 1) {
+                        return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
+                    }
+                    return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
+                },
+
+                easeInElastic: function (x, t, b, c, d) {
+                    var s=1.70158;var p=0;var a=c;
+
+                    if (t===0) return b;
+                    if ((t/=d)===1) return b+c;  
+                    if (!p) p=d*0.3;
+
+                    if (a < Math.abs(c)) { 
+                        a=c; s=p/4; 
+                    } else {
+                        s = p/(2*Math.PI) * Math.asin (c/a);
+                    }
+                    return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+                },
+
+                easeOutElastic: function (x, t, b, c, d) {
+                    var s=1.70158;var p=0;var a=c;
+
+                    if (t===0) return b;  
+                    if ((t/=d)===1) return b+c;  
+                    if (!p) p=d*0.3;
+                    if (a < Math.abs(c)) { 
+                        s=p/4; 
+                        a=c; 
+                    } else {
+                        s = p/(2*Math.PI) * Math.asin (c/a);
+                    }
+                    return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
+                },
+
+                easeInOutElastic: function (x, t, b, c, d) {
+                    var s=1.70158;var p=0;var a=c;
+
+                    if (t===0) return b;  
+                    if ((t/=d/2)===2) return b+c;  
+                    if (!p) p=d*(0.3*1.5);
+
+                    if (a < Math.abs(c)) { 
+                        s=p/4; 
+                        a=c; 
+                    } else {
+                        s = p/(2*Math.PI) * Math.asin (c/a);
+                    }
+                    if (t < 1) return -0.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
+
+                    return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*0.5 + c + b;
+                },
+
+                easeInBack: function (x, t, b, c, d, s) {
+                    if (s === undefined) s = 1.70158;
+                    return c*(t/=d)*t*((s+1)*t - s) + b;
+                },
+
+                easeOutBack: function (x, t, b, c, d, s) {
+                    if (s === undefined) s = 1.70158;
+                    return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
+                },
+
+                easeInOutBack: function (x, t, b, c, d, s) {
+                    if (s === undefined) s = 1.70158; 
+                    if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
+                    return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
+                },
+
+                easeInBounce: function (x, t, b, c, d) {
+                    return c - jQuery.easing.easeOutBounce (x, d-t, 0, c, d) + b;
+                },
+                easeOutBounce: function (x, t, b, c, d) {
+                    if ((t/=d) < (1/2.75)) {
+                        return c*(7.5625*t*t) + b;
+                    } else if (t < (2/2.75)) {
+                        return c*(7.5625*(t-=(1.5/2.75))*t + 0.75) + b;
+                    } else if (t < (2.5/2.75)) {
+                        return c*(7.5625*(t-=(2.25/2.75))*t + 0.9375) + b;
+                    } else {
+                        return c*(7.5625*(t-=(2.625/2.75))*t + 0.984375) + b;
+                    }
+                },
+                easeInOutBounce: function (x, t, b, c, d) {
+                    if (t < d/2) return jQuery.easing.easeInBounce (x, t*2, 0, c, d) * 0.5 + b;
+                    return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * 0.5 + c*0.5 + b;
+                }
+            });
+
+        },
+        unload: function() {}
+    };
+});
+;/* --------------------------------------- *
 * Guerrilla UI                             *
 * @module: Charm, timed animations based   * 
 * on scrolling and page location           *
 * ---------------------------------------- */
 $.GUI().use(function(gui) {
- 
+
     return {
 
         load: function(api) {
@@ -2670,11 +2895,11 @@ $.GUI().use(function(gui) {
                     this.scrollCallback = api.broker.bind(this.scrollCallback, this);
                     this.resetAnimation = api.broker.bind(this.resetAnimation, this);
 
-                    this.config = api.utils.merge(options, this.defaults);
+                    this.config = this.extend(options, this.defaults);
                     this.charmEvent = this.Event.create(this.config.boxClass);
 
-                    this.animationNameCache = api.dom.map;
                     this.scrolled = true;
+                    this.animationNameCache = api.dom.map;
                 }
 
                 Charm.prototype.defaults = {
@@ -2683,15 +2908,31 @@ $.GUI().use(function(gui) {
                     offset: 0,
                     mobile: true,
                     live: true,
-                    callback: null
+                    callback: null,
+                    scrollContainer: null
+                };
+
+                Charm.prototype.extend = function(custom, defaults) {
+                    var key, value;
+
+                    for (key in defaults) {
+
+                        value = defaults[key];
+
+                        if (custom[key] !== null) {
+                            custom[key] = value;
+                        }
+                    }
+
+                    return custom;
                 };
 
                 Charm.prototype.vendors = ["moz", "webkit"];
 
-                Charm.prototype.Event = api.dom.event;
+                Charm.prototype.Event = api.dom.Event;
                 
                 Charm.prototype.disabled = function() {
-                    return !this.config.mobile && this.event.isMobile(navigator.userAgent);
+                    return !this.config.mobile && this.Event.isMobile(navigator.userAgent);
                 };
 
                 Charm.prototype.init = function() {
@@ -2815,8 +3056,8 @@ $.GUI().use(function(gui) {
                 Charm.prototype.stop = function() {
                     this.stopped = true;
 
-                    this.event.remove(window, 'scroll', this.scrollHandler);
-                    this.event.remove(window, 'resize', this.scrollHandler);
+                    this.Event.remove(window, 'scroll', this.scrollHandler);
+                    this.Event.remove(window, 'resize', this.scrollHandler);
 
                     if (this.interval !== null) {
                         return window.clearInterval(this.interval);
@@ -2939,11 +3180,11 @@ $.GUI().use(function(gui) {
                     return results;
                 };
 
-                Charm.prototype.resetAnimation = function(event) {
+                Charm.prototype.resetAnimation = function(e) {
                     var target;
 
-                    if (event.type.toLowerCase().indexOf('animationend') >= 0) {
-                        target = event.target || event.srcElement;
+                    if (e.type.toLowerCase().indexOf('animationend') >= 0) {
+                        target = e.target || e.srcElement;
 
                         target.className = target.className.replace(this.config.animateClass, '').trim();
 
@@ -3068,28 +3309,24 @@ $.GUI().use(function(gui) {
                     if (this.scrolled) {
                         this.scrolled = false;
                         this.boxes = (function() {
-                            var i = 0, lenth, ref, results = [];
+                            var j, len, ref, results;
 
                             ref = this.boxes;
-                            length = ref.length;
-                            
-                            if (length > 0) {
+                            results = [];
 
-                                do {
-                                    box = ref[i];
+                            for (j = 0, len = ref.length; j < len; j++) {
+                                box = ref[j];
 
-                                    if (!(box)) {
-                                        continue;
-                                    }
-                                    if (this.isVisible(box)) {
-                                        this.show(box);
-                                        continue;
-                                    }
+                                if (!(box)) {
+                                    continue;
+                                }
 
-                                    results.push(box);
-                                    i++;
+                                if (this.isVisible(box)) {
+                                    this.show(box);
+                                    continue;
+                                }
 
-                                } while (--length);
+                                results.push(box);
                             }
 
                             return results;
@@ -3097,7 +3334,6 @@ $.GUI().use(function(gui) {
                         }).call(this);
 
                         if (!(this.boxes.length || this.config.live)) {
-
                             return this.stop();
                         }
                     }
@@ -3124,7 +3360,7 @@ $.GUI().use(function(gui) {
                 Charm.prototype.isVisible = function(box) {
                     var bottom, offset, top, viewBottom, viewTop;
 
-                    offset = box.getAttribute('data-wow-offset') || this.config.offset;
+                    offset = box.getAttribute('data-charm-offset') || this.config.offset;
 
                     viewTop = window.pageYOffset;
                     viewBottom = viewTop + Math.min(this.element.clientHeight, this.Event.innerHeight()) - offset;
@@ -3635,11 +3871,29 @@ $.GUI().use(function(G) {
 
                         clearTimeout(timeout);
 
-                        timeout = setTimeout(utils.proxy(function () {
+                        timeout = api.timeout(utils.proxy(function () {
                             fn.apply(this, args);
                         }, context || this), time);
                     };
                 },
+
+                /**
+                * Delays a method call for given milliseconds 
+                *
+                * @param time {number} - the amount of time to wait 
+                * @param callback {function} - the function to execute when time done 
+                * @return {function}
+                **/
+                delay: (function(callback,  ms) {
+                    var timer = 0;
+
+                    return function(callback, ms) {
+
+                        clearTimeout(timer);
+
+                        timer = api.timeout(callback, ms);
+                    };
+                })(),
                 
                 /**
                  * Allow passed method to only be executed only once
@@ -3684,7 +3938,7 @@ $.GUI().use(function(G) {
                         if (!run) {
                             run = true;
 
-                            setTimeout(function() {
+                            api.timeout(function() {
                                 fn.apply(ctx, args);
                                 run = false;
                             }, time);
@@ -3703,7 +3957,7 @@ $.GUI().use(function(G) {
                     var args = arguments,
                         ctx = context || this;
 
-                    setTimeout(function() {
+                    api.timeout(function() {
                         fn.apply(ctx, args);
                     }, 0);
                 }

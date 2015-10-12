@@ -1450,7 +1450,7 @@ button.filter + label {
   width:50%
 }
 .over-div-left {
-  background:none repeat scroll 0 0 rgba(0,0,0,0.05);
+  background:none repeat scroll 0 0 rgba(0,0,0,0.1);
   bottom:0;
   position:absolute;
   left:0;
