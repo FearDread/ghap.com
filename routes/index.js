@@ -1,20 +1,26 @@
-var json;
-var nodemailer = require('nodemailer');
+var json, mailer;
 
 json = exports.json = function(req) {
     return req.query && req.query.json;
 };
 
-exports.addRoutes = function(app) {
+mailer = require('nodemailer');
+
+exports.add = function(app) {
+
+    app.use(function(req, res, next) {
+        console.log('Something is happening on Ghap API.');
+        next(); 
+    });
 
     app.get('/', function(req, res) {
         res.render('home', {});
     });
 
     app.post('/contact', function (req, res) {
-        var mailOpts, smtpTrans;
+        var options, transport;
 
-        smtpTrans = nodemailer.createTransport('SMTP', {
+        transport = mailer.createTransport('SMTP', {
             service: 'Gmail',
             auth: {
                 user: "ghaptonstall@gmail.com",
@@ -22,18 +28,28 @@ exports.addRoutes = function(app) {
             }
         });
 
-        mailOpts = {
+        options = {
             from: req.body.name + ' &lt;' + req.body.email + '&gt;', //grab form data from the request body object
             to: 'me@gmail.com',
             subject: 'Website contact form',
             text: req.body.message
         };
 
-        smtpTrans.sendMail(mailOpts, function (error, response) {
+        transport.sendMail(options, function (error, response) {
             if (error) {
-                res.render('contact', { title: 'Raging Flame Laboratory - Contact', msg: 'Error occured, message not sent.', err: true, page: 'contact' })
+                res.render('home', { 
+                    title: 'Raging Flame Laboratory - Contact',
+                    msg: 'Error occured, message not sent.',
+                    err: true,
+                    page: 'contact' 
+                })
             } else {
-                res.render('contact', { title: 'Raging Flame Laboratory - Contact', msg: 'Message sent! Thank you.', err: false, page: 'contact' })
+                res.render('contact', { 
+                    title: 'Raging Flame Laboratory - Contact',
+                    msg: 'Message sent! Thank you.',
+                    err: false,
+                    page: 'contact'
+                })
             }
         });
     });
