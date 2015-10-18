@@ -1,13 +1,19 @@
 /* GHAP.com */
-var server, host, port;
-var fs = require('fs');
-var path = require('path');
-var express = require('express');
-var routes = require('./routes');
-var less = require('less-middleware');
+var server, host, port, fs, path, express, routes, 
+    less, utapi, app, pub, router;
 
-var app = express();
-var pub = __dirname;
+fs = require('fs');
+path = require('path');
+express = require('express');
+routes = require('./routes');
+less = require('less-middleware');
+/* APIs */
+utapi = require('./routes/api/ut');
+
+/* APP */
+app = express();
+pub = __dirname;
+router = express.Router();
 
 app.set('views', pub + '/public/views');
 app.set('view engine', 'jade');
@@ -18,7 +24,9 @@ app.use(less(path.join(pub, '/src', 'less'), {
 
 app.use(express.static(path.join(pub, '/public')));
 
-routes.addRoutes(app);
+routes.add(app);
+
+utapi.add(app);
 
 server = app.listen(4000, function () {
     host = server.address().address;
