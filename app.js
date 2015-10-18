@@ -1,4 +1,5 @@
 /* GHAP.com */
+var server, host, port;
 var fs = require('fs');
 var path = require('path');
 var express = require('express');
@@ -11,17 +12,17 @@ var pub = __dirname;
 app.set('views', pub + '/public/views');
 app.set('view engine', 'jade');
 
-app.use(less(path.join(pub, 'src', 'less'), {
-    dest: path.join(pub, '/public')
+app.use(less(path.join(pub, '/src', 'less'), {
+    dest: path.join(pub, '/public', 'css')
 }));
 
 app.use(express.static(path.join(pub, '/public')));
 
 routes.addRoutes(app);
 
-var server = app.listen(4000, function () {
-    var host = server.address().address;
-    var port = server.address().port;
+server = app.listen(4000, function () {
+    host = server.address().address;
+    port = server.address().port;
 
-    console.log('Example app listening at http://%s:%s', host, port);
+    console.log('GHAP.com listening at http://%s:%s', host, port);
 });
