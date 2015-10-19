@@ -1,19 +1,29 @@
 /* GHAP.com */
 var server, host, port, fs, path, express, routes, 
-    less, utapi, app, pub, router;
+    less, utapi, app, pub, router, bodyParser, mongo;
 
+/* MODS */
 fs = require('fs');
 path = require('path');
 express = require('express');
 routes = require('./routes');
 less = require('less-middleware');
+mongo = require('mongoose');
+bodyParser = require('body-parser');
+
 /* APIs */
-utapi = require('./routes/api/ut');
+utapi = require('./routes/api/ultimate_totals');
 
 /* APP */
 app = express();
 pub = __dirname;
 router = express.Router();
+utils = require('./utils');
+
+mongo.connect('mongodb://localhost/ultimate_totals_db');
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.set('views', pub + '/public/views');
 app.set('view engine', 'jade');
