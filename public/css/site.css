@@ -128,7 +128,8 @@ ul li {
   background:#252733;
 }
 .fun-facts {
-  background:url("../img/fun-bg.jpg") no-repeat scroll center center rgba(0,0,0,0);
+  background:url("../img/fun-bg.jpg") center center fixed rgba(0,0,0,0);
+  background-size:cover;
   overflow:hidden;
   padding:20px
 }
