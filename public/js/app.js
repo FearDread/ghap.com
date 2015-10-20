@@ -1,7 +1,10 @@
 /* Ghap.com App Module */
 $.GUI().create('App', function(gui) {
-    var $container = gui.$('.page-container'), mediaListener;
+    var $container, mediaListener, gmap, maps;
+
     gui.log('GUI :: ', gui);
+
+    $container = gui.$('.page-container');
 
     // dynamic responsive styles
     mediaListener = new gui.ui.media({
@@ -89,6 +92,40 @@ $.GUI().create('App', function(gui) {
         $('.is-full-width .page-title').css('opacity', newOpacity);
     }
 
+    maps = {
+        location: null,
+        init: function (obj) {
+            var map, mapOptions;
+
+            // zoom in to the maps set location
+            mapOptions = {
+                zoom: 12
+            };
+
+            // init google map
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            // set marker using the map and location
+            this.setMarker(map, obj);
+        },
+        setMarker: function (map, obj) {
+            // Variables
+            var _this = this, icon, marker;
+
+            this.location = new google.maps.LatLng(obj.latitude, obj.longitude);
+
+            // set new marker
+            marker = new google.maps.Marker({
+                map: map,
+                title: obj.title,
+                position: _this.location 
+            });
+
+            // set where your located in the center of the screen
+            map.setCenter(marker.getPosition());
+        }
+    };
+
     return {
         containerScroll: function() {
             requestAnim(changeOpacity);
@@ -101,6 +138,12 @@ $.GUI().create('App', function(gui) {
             $('.page-close', $container).click(closePage);
             $('.page-scroll', $container).click(scrollTop);
             $('.single-page').click(openPage);
+
+            maps.init({
+                title: 'My Address',
+                latitude: 36.1439353,
+                longitude: -115.1780559 
+            });
         },
         preload: function() {
             $('.loader').fadeOut();
