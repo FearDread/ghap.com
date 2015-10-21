@@ -3,7 +3,6 @@ $.GUI().create('App', function(gui) {
     var $container, mediaListener, gmap, maps;
 
     gui.log('GUI :: ', gui);
-
     $container = gui.$('.page-container');
 
     // dynamic responsive styles
@@ -20,7 +19,41 @@ $.GUI().create('App', function(gui) {
         }
     });
 
-    mediaListener();
+    maps = {
+        location: null,
+        init: function (obj) {
+            var map, mapOptions;
+
+            mapOptions = {
+                position: "TOP_CENTER",
+                zoom: 13,
+                zoomControl: true,
+                zoomControlOpt: {
+                    style: 'SMALL',
+                    position: 'TOP_LEFT'
+                },
+                panControl: false,
+                scrollwheel: false
+            };
+
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            this.setMarker(map, obj);
+        },
+        setMarker: function (map, obj) {
+            var _this = this, icon, marker;
+
+            this.location = new google.maps.LatLng(obj.latitude, obj.longitude);
+
+            marker = new google.maps.Marker({
+                map: map,
+                title: obj.title,
+                position: _this.location 
+            });
+
+            map.setCenter(marker.getPosition());
+        }
+    };
 
     function scrollTop() {
         $container.animate({
@@ -81,6 +114,10 @@ $.GUI().create('App', function(gui) {
         }
     }
 
+    function containerScroll() {
+        requestAnim(changeOpacity);
+    }
+
     function requestAnim(value) {
         return window.requestAnimationFrame(value);
     }
@@ -92,44 +129,7 @@ $.GUI().create('App', function(gui) {
         $('.is-full-width .page-title').css('opacity', newOpacity);
     }
 
-    maps = {
-        location: null,
-        init: function (obj) {
-            var map, mapOptions;
-
-            // zoom in to the maps set location
-            mapOptions = {
-                zoom: 12
-            };
-
-            // init google map
-            map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-            // set marker using the map and location
-            this.setMarker(map, obj);
-        },
-        setMarker: function (map, obj) {
-            // Variables
-            var _this = this, icon, marker;
-
-            this.location = new google.maps.LatLng(obj.latitude, obj.longitude);
-
-            // set new marker
-            marker = new google.maps.Marker({
-                map: map,
-                title: obj.title,
-                position: _this.location 
-            });
-
-            // set where your located in the center of the screen
-            map.setCenter(marker.getPosition());
-        }
-    };
-
     return {
-        containerScroll: function() {
-            requestAnim(changeOpacity);
-        },
         initPlugins: function () {
             // Magnific Popup
             $('.open-portfolio').magnificPopup({
@@ -161,11 +161,40 @@ $.GUI().create('App', function(gui) {
         bindEvents: function() {
             var _this = this;
 
-            $container.scroll(_this.containerScroll);
+            $container.scroll(containerScroll);
 
             $('.page-close', $container).click(closePage);
             $('.page-scroll', $container).click(scrollTop);
             $('.single-page').click(openPage);
+            $('form.contact-form .submit').click(function () {
+                var data;
+
+                data = gui.serialize('form.contact-form');
+
+                gui.xhr({type: 'POST', url: '/contact', data: data,
+                    success: function (res) {
+                        gui.log('contact form res = ', res);
+
+                        if (res.status === 200) {
+
+                            $('#image-loader').fadeOut();
+                            $('#message-warning').hide();
+                            $('#contactForm').fadeOut();
+                            $('#message-success').fadeIn();
+                            
+                        } else {
+                            $('#image-loader').fadeOut();
+                            $('#message-warning').html(msg);
+                            $('#message-warning').fadeIn();
+                        }
+                    },
+                    error: function (err) {
+                        if (err) {
+                            gui.warn('Error: ', err);
+                        }
+                    }
+                });
+            });
 
             maps.init({
                 title: 'My Address',
@@ -174,10 +203,11 @@ $.GUI().create('App', function(gui) {
             });
         },
         preload: function() {
-            $('.loader').fadeOut();
-
-            $('.preloader').delay(300).fadeOut('slow');
-            $('body').delay(300);
+            gui.$(window).load(function () {
+                $('.loader').fadeOut();
+                $('.preloader').delay(350).fadeOut('slow');
+                $('body').delay(350);
+            });
         },
         load: function() {
             var _this = this, charm;
@@ -186,6 +216,8 @@ $.GUI().create('App', function(gui) {
                 _this.preload();
                 _this.bindEvents();
                 _this.initPlugins();
+
+                mediaListener();
 
                 gui.$('.single-page').background({
                     afterLoaded: function() {
