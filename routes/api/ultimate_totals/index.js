@@ -24,8 +24,21 @@ exports.add = function(app, passport) {
     app.route('/ut/login')
 
         .post(function (req, res) {
-            res.json({message: 'login attempt', body: req.body});
+            var email = req.body.email;
+            var password = req.body.password;
 
+            user.findOne({'user.email': email},
+            function (err, user) {
+                if (err || !user) {
+                    return res.json({error: 'Error', message: 'User does not exist.', body: req.body});
+                }
+
+                if (!user.verify(password)) {
+                    return res.json({error: '400', message: 'Enter correct password.', body: req.body});
+                }
+
+                return res.json({message: 'login attempt', body: req.body, user:user});
+            });
         });
 
     app.route('/ut/user')
