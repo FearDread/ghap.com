@@ -8,8 +8,9 @@ module.exports = function (passport) {
     });
 
     // deserialized when subsequent requests are made
-    passport.deserializeUser(function(id, done) {
-        User.findById(id, function(err, user) {
+    passport.deserializeUser(function (id, done) {
+        User.findById(id,
+        function (err, user) {
             done(err, user);
         });
     });
@@ -20,7 +21,8 @@ module.exports = function (passport) {
     }, 
     function (req, email, password, done) {
         process.nextTick(function() {
-            User.findOne({ 'user.email' :  email }, function(err, user) {
+            User.findOne({'user.email': email},
+            function (err, user) {
                 if (err) { 
                     return done(err);
                 }
@@ -29,7 +31,7 @@ module.exports = function (passport) {
                     return done(null, false, req.flash('error', 'User does not exist.'));
                 }
 
-                if (!user.verifyPassword(password)) {
+                if (!user.verify(password)) {
                     return done(null, false, req.flash('error', 'Enter correct password'));
                 } else {
                     return done(null, user);
@@ -47,7 +49,8 @@ module.exports = function (passport) {
         process.nextTick(function () {
        
             if (!req.user) {
-                User.findOne({ 'user.email' :  email }, function(err, user) {
+                User.findOne({'user.email': email},
+                function (err, user) {
                     if (err) { 
                         return done(err);
                     }
@@ -67,8 +70,10 @@ module.exports = function (passport) {
                         newUser.user.address = '';
 
                         newUser.save(function (err) {
-                            if (err)
+                            if (err) {
                                 throw err;
+                            }
+
                             return done(null, newUser);
                         });
                     }

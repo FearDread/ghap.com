@@ -1,10 +1,10 @@
-var User, mongo, schema, userSchema;
+var mongo, bcrypt, user;
 
-mongoose = require('mongoose');
-schema = mongoose.Schema;
+mongo = require('mongoose');
+bcrypt = require('bcrypt-nodejs');
 
 // create a schema
-userSchema = new schema({
+user = new mongo.Schema({
     name: String,
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -21,6 +21,27 @@ userSchema = new schema({
     updated_at: Date
 });
 
-// export user model
-module.exports = mongoose.model('User', userSchema);
+user.methods.hash = function(password) {
+    return bcrypt.hashSync(
+        password,
+        bcrypt.genSaltSync(8),
+        null
+    );
+};
 
+user.methods.verify = function(password) {
+    return bcrypt.compareSync(password, this.user.password);
+};
+
+user.methods.update = function(req, res) {
+    var _this = this;
+
+    this.user.name = req.body.name;
+    this.user.address = req.body.address;
+
+    this.user.save();
+    res.json({user:_this.user});
+};
+
+// export user model
+module.exports = mongo.model('User', user);
