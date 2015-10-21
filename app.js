@@ -1,18 +1,20 @@
 /* GHAP.com */
-var server, host, port, fs, path, express, routes, mongoStr, passport, less, utapi, app, pub, bodyParser, mongo;
+var server, host, port, fs, path, express, routes, mongoStr, passport, less, utapi, app, pub, bodyParser, mongo, flash, ultimate;
 
 /* MODS */
 fs = require('fs');
 path = require('path');
+flash = require('connect-flash');
 express = require('express');
-routes = require('./routes');
+session = require('express-session');
 less = require('less-middleware');
 mongo = require('mongoose');
 passport = require('passport');
 bodyParser = require('body-parser');
 
 /* APIs */
-utapi = require('./routes/api/ultimate_totals');
+routes = require('./routes');
+ultimate = require('./routes/api/ultimate_totals');
 
 /* Tools */
 utils = require('./src/utils');
@@ -34,13 +36,17 @@ app.use(less(path.join(pub, '/src', 'less'), {
 }));
 
 app.use(express.static(path.join(pub, '/public')));
+app.use(session({ secret: config.secret })); 
+
+app.use(passport.initialize());
+app.use(passport.session()); 
+app.use(flash()); 
 
 routes.add(app);
+ultimate.add(app, passport);
 
-utapi.add(app, passport);
-
-mongo.connect(config.url, function () {
-  console.log('MongoDB connected at ' + config.url);
+mongo.connect(config.db, function () {
+  console.log('MongoDB connected at ' + config.db);
   
   server = app.listen(4000, function () {
       host = server.address().address;

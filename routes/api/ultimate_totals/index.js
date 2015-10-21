@@ -1,6 +1,6 @@
 var pg, utils, user, model;
 
-// model = require('./src/models/user');
+user = require('../../../src/models/user.js');
 
 /* Ultimate Totals API */
 exports.add = function(app, passport) {
@@ -13,13 +13,33 @@ exports.add = function(app, passport) {
     app.route('/ut')
 
         .get(function (req, res) {
-            var user = {};
 
             res.json({ message: 'Welcome to Ultimate Totals api!', user: user });
         })
 
         .post(function (req, res) {
 
+        });
+
+    app.route('/ut/user')
+         
+        .get(function (req, res) {
+
+        })
+
+        .post(function (req, res) {
+
+        });
+
+    app.route('/ut/user/:id')
+         
+        .get(function (req, res) {
+
+        })
+
+        .put(function (req, res) {
+
+            user.update(req, res);
         });
 
     app.route('/ut/account')
