@@ -30,7 +30,7 @@ exports.add = function(app) {
 
         options = {
             from: req.body.name + ' &lt;' + req.body.email + '&gt;', //grab form data from the request body object
-            to: 'me@gmail.com',
+            to: 'ghaptonstall@gmail.com',
             subject: 'Website contact form',
             text: req.body.message
         };
@@ -38,18 +38,18 @@ exports.add = function(app) {
         transport.sendMail(options, function (error, response) {
             if (error) {
                 res.render('home', { 
-                    title: 'Raging Flame Laboratory - Contact',
+                    title: 'GHAP.com - Contact',
                     msg: 'Error occured, message not sent.',
                     err: true,
                     page: 'contact' 
-                })
+                });
             } else {
                 res.render('contact', { 
-                    title: 'Raging Flame Laboratory - Contact',
+                    title: 'GHAP.com - Contact',
                     msg: 'Message sent! Thank you.',
                     err: false,
                     page: 'contact'
-                })
+                });
             }
         });
     });

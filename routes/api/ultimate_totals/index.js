@@ -3,7 +3,7 @@ var pg, utils, user, model;
 // model = require('./src/models/user');
 
 /* Ultimate Totals API */
-exports.add = function(app) {
+exports.add = function(app, passport) {
 
     app.use('/ut/', function(req, res, next) {
         console.log('Something is happening on Ultimate Totals API.');
@@ -13,22 +13,8 @@ exports.add = function(app) {
     app.route('/ut')
 
         .get(function (req, res) {
-            /*
-            user = model({
-                name: 'Garrett Haptonstall',
-                first_name: 'Garrett',
-                last_name: 'Haptonstall',
-                username: 'ghap205',
-                password: 'password',
-                admin: true
-            });
+            var user = {};
 
-            user.save(function (err) {
-                if (err) Throw err; 
-
-                console.log('Saved new user ..');
-            });
-            */
             res.json({ message: 'Welcome to Ultimate Totals api!', user: user });
         })
 
