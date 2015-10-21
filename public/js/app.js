@@ -131,28 +131,20 @@ $.GUI().create('App', function(gui) {
 
     return {
         initPlugins: function () {
-            // Magnific Popup
             $('.open-portfolio').magnificPopup({
                 type: 'inline',
                 midClick: true,
                 zoom: {
                     enabled: true,
-                    duration: 300, // duration of the effect, in milliseconds
-                    easing: 'ease-in-out' // CSS transition easing function 
+                    duration: 300,
+                    easing: 'ease-in-out'
                 }
             });
 
+            $('#portfolio').mixItUp();
 
-            // Mixitup Filter
-            $(function() {
-                // Instantiate MixItUp:
-                $('#portfolio').mixItUp();
-            });
-
-
-            // Testimonial Slider
             $("#testimonial-slides").owlCarousel({
-                navigation: false, // Show next and prev buttons
+                navigation: false,
                 slideSpeed: 300,
                 paginationSpeed: 400,
                 singleItem: true
@@ -203,32 +195,33 @@ $.GUI().create('App', function(gui) {
             });
         },
         preload: function() {
-            gui.$(window).load(function () {
-                $('.loader').fadeOut();
-                $('.preloader').delay(350).fadeOut('slow');
-                $('body').delay(350);
-            });
+            $('.loader').fadeOut();
+            $('.preloader').delay(350).fadeOut('slow');
+            $('body').delay(350);
         },
         load: function() {
             var _this = this, charm;
 
-            gui.timeout(function(){
-                _this.preload();
-                _this.bindEvents();
-                _this.initPlugins();
+            gui.$(window).load(function () {
+
+                gui.timeout(function(){
+                    _this.preload();
+                    _this.bindEvents();
+                    _this.initPlugins();
+
+                    gui.$('.single-page').background({
+                        afterLoaded: function() {
+                            showCaption($('.single-page', $container).eq(0));
+                        }
+                    });
+
+                    charm = new gui.ui.charm();
+                    charm.init();
+
+                }, 1000);
 
                 mediaListener();
-
-                gui.$('.single-page').background({
-                    afterLoaded: function() {
-                        showCaption($('.single-page', $container).eq(0));
-                    }
-                });
-
-                charm = new gui.ui.charm();
-                charm.init();
-
-            }, 1000);
+            });
         },
         unload: function() {}
     };
