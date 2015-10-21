@@ -10,6 +10,10 @@ exports.add = function(app) {
 
     app.use(function(req, res, next) {
         console.log('Something is happening on Ghap API.');
+
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
         next(); 
     });
 

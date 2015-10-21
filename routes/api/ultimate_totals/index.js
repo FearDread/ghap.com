@@ -21,6 +21,13 @@ exports.add = function(app, passport) {
 
         });
 
+    app.route('/ut/login')
+
+        .post(function (req, res) {
+            res.json({message: 'login attempt', body: req.body});
+
+        });
+
     app.route('/ut/user')
          
         .get(function (req, res) {
