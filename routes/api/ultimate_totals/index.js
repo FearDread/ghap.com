@@ -1,8 +1,15 @@
-var pg, utils, user, model, path;
+var pg, utils, user, model, path, User;
 
 path = '../../../src';
-
 User = require(path + '/models/user.js');
+
+function auth(req, res, next) {
+  if (req.isAuthenticated()) { 
+      return next(); 
+  }
+
+  res.redirect('/login')
+}
 
 /* Ultimate Totals API */
 exports.add = function(app, passport) {
@@ -17,7 +24,7 @@ exports.add = function(app, passport) {
 
         .get(function (req, res) {
 
-            res.json({ message: 'Welcome to Ultimate Totals api!', user: User });
+            res.json({message: 'Welcome to Ultimate Totals api!', user: user});
         })
 
         .post(function (req, res) {
@@ -30,8 +37,11 @@ exports.add = function(app, passport) {
             var email = req.body.email,
                 password = req.body.password;
 
-            user.findOne({'user.email': email}, function (err, user) {
-                if (err || !user) {
+            process.nextTick(function() {
+                console.log('next tick');
+            User.findOne({'user.username': email}, function (err, user) {
+                console.log('wtf');
+                if (err) {
                     return res.json({
                         error: 'Error',
                         message: 'User does not exist.',
@@ -39,7 +49,7 @@ exports.add = function(app, passport) {
                     });
                 }
 
-                if (!user.verify(password)) {
+                if (!User.verify(password)) {
                     return res.json({
                         error: 'Error',
                         message: 'Enter correct password.',
@@ -48,6 +58,7 @@ exports.add = function(app, passport) {
                 }
 
                 return res.json({message: 'login success', body: req.body, user:user, status: 200});
+            });
             });
         });
 
@@ -75,7 +86,7 @@ exports.add = function(app, passport) {
 
                     } else {
 
-                        newUser = new User();
+                        newUser = new user();
 
                         newUser.user.username = username;
                         newUser.user.email = email;

@@ -15,12 +15,11 @@ module.exports = function (passport) {
         });
     });
 
-    passport.use('/ut/login', new LocalStrategy({
+    passport.use('login', new LocalStrategy({
         usernameField : 'email',
         passReqToCallback : true 
     }, 
     function (req, email, password, done) {
-        console.log('hit login');
         process.nextTick(function() {
             User.findOne({'user.email': email},
             function (err, user) {
