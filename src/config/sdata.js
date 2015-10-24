@@ -5,7 +5,7 @@ config = require('../config');
 
 module.exports = {
     endpoints:{
-        ranks:'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/rankings.xml?api_key=' + config.sdata.key,
+        ranks:'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/rankings.json?api_key=' + config.sdata.key,
         season:'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/teams/[team_id]/statistics.xml?api_key=395ykxy34yqan3txm5zaqv6u',
         injuries:'https://api.sportsdatallc.org/nba-t3/league/injuries.xml?api_key=395ykxy34yqan3txm5zaqv6u',
         schedule:'https://api.sportsdatallc.org/nba-t3/games/2014/reg/schedule.xml?api_key=395ykxy34yqan3txm5zaqv6u',
