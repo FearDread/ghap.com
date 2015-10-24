@@ -2,7 +2,6 @@ var $, config;
 
 $ = require('najax');
 config = require('../config');
-console.log('ajax? ', $.ajax);
 
 module.exports = {
     endpoints:{
