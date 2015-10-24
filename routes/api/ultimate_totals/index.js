@@ -28,18 +28,18 @@ exports.add = function(app, passport) {
         .get(function (req, res) {
 
             var ghap = new User({
-                name: 'Garrett',
-                username: 'GHAP',
-                email: 'ghaptonstall@gmail.com',
+                name: 'Jim Bean',
+                username: 'jimbean',
+                email: 'fear@gmail.com',
                 password: 'doggie'
             });
-            console.log('user = ', ghap);
 
+            ghap.password = ghap.hash(ghap.password);
             ghap.save(function (err) {
-                console.log('wtf');
-                if (err) throw err;
+                if (err) {
+                    res.json({message: 'user exists'});
+                }
 
-                console.log('User GHAP Saved');
                 res.json({message: 'Welcome to Ultimate Totals api!', user: ghap});
             });
         });
@@ -47,29 +47,29 @@ exports.add = function(app, passport) {
     app.route('/ut/login')
 
         .post(function (req, res) {
-            var email = req.body.email,
+            var username = req.body.username,
                 password = req.body.password;
 
-            User.find({'user.username': email}, function (err, user) {
-                console.log('error : ', err);
-                console.log('user: ', user);
-                if (err) {
+            User.findOne({username: username}, function (err, user) {
+                if (err || !user) {
                     return res.json({
                         error: 'Error',
+                        success: false,
                         message: 'User does not exist.',
                         status: 304
                     });
                 }
 
-                if (!User.verify(password)) {
+                if (user && !user.verify(password)) {
                     return res.json({
                         error: 'Error',
+                        success: false,
                         message: 'Enter correct password.',
                         status: 304 
                     });
                 }
 
-                return res.json({message: 'login success', body: req.body, user:user, status: 200});
+                return res.json({success: true, message: 'login success', user:user, status: 200});
             });
         });
 
@@ -77,12 +77,13 @@ exports.add = function(app, passport) {
 
         .post(function (req, res) {
             var user, newUser,
+                fullname = req.body.first_name + ' ' + req.body.last_name,
                 email = req.body.email,
                 username = req.body.username,
                 password = req.body.password;
 
             if (!req.user) {
-                User.find({'user.email': email}, function (err, user) {
+                User.findOne({username: username}, function (err, user) {
                     if (err || !user) { 
                         return res.json(err);
                     }
@@ -91,24 +92,30 @@ exports.add = function(app, passport) {
 
                         return res.json({
                             error: 'Error',
+                            success: false,
                             message: 'User already exists.',
                             status: 304 
                         });
 
                     } else {
-
                         newUser = new user();
 
-                        newUser.username = username;
+                        newUser.name = fullname;
                         newUser.email = email;
+                        newUser.username = username;
                         newUser.password = newUser.hash(password);
-                        newUser.name = '';
                         newUser.location = '';
 
                         newUser.save(function (err) {
-                            if (err) throw err;
+                            if (err) {
+                                return res.json({
+                                    error: 'Error',
+                                    success: false,
+                                    message: 'Unable to save user.'
+                                });
+                            }
 
-                            return res.json({user: newUser, status: 200});
+                            return res.json({success: true, user: newUser, status: 200});
                         });
                     }
                 });
@@ -134,16 +141,16 @@ exports.add = function(app, passport) {
     app.route('/ut/user')
          
         .get(function (req, res) {
-            User.findAll(function (err, users) {
-                console.log('all users = ', users);
+            User.find({}, function (err, users) {
                 if (users && users.length > 0) {
 
-                    res.json({users: users, status: 200});
+                    return res.json({success: true, users: users, status: 200});
 
                 } else {
 
-                    res.json({
+                    return res.json({
                         error: 'Error',
+                        success: false,
                         message: 'No users found.',
                         status: 304
                     });
@@ -163,7 +170,18 @@ exports.add = function(app, passport) {
 
         .put(function (req, res) {
 
-            user.update(req, res);
+            user.update(req.body, function (err) {
+                if (err) {
+                    return res.json({
+                        error: 'Error',
+                        success: false,
+                        message: 'Unable to update user.',
+                        status: 400
+                    });
+                }
+
+                return res.json({success: true, user: user, status: 200});
+            });
         });
 
 };

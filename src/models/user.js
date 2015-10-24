@@ -1,10 +1,11 @@
-var mongo, bcrypt, user;
+var mongo, bcrypt, userSchema, Schema;
 
 mongo = require('mongoose');
 bcrypt = require('bcrypt-nodejs');
+Schema = mongo.Schema;
 
 // create a schema
-user = new mongo.Schema({
+userSchema = new Schema({
     name: String,
     email: {type: String, required: true },
     username: { type: String, required: true, unique: true },
@@ -22,7 +23,7 @@ user = new mongo.Schema({
     updated_at: Date
 });
 
-user.methods.hash = function(password) {
+userSchema.methods.hash = function(password) {
     return bcrypt.hashSync(
         password,
         bcrypt.genSaltSync(8),
@@ -30,19 +31,33 @@ user.methods.hash = function(password) {
     );
 };
 
-user.methods.verify = function(password) {
-    return bcrypt.compareSync(password, this.user.password);
+userSchema.methods.verify = function(password) {
+    return bcrypt.compareSync(password, this.password);
 };
 
-user.methods.update = function(req, res) {
+userSchema.methods.update = function(req, res) {
     var _this = this;
 
-    this.user.name = req.body.name;
-    this.user.address = req.body.address;
+    this.name = req.body.name;
+    this.address = req.body.address;
 
-    this.user.save();
-    res.json({user:_this.user});
+    this.save();
+    res.json({user:_this});
 };
 
+userSchema.pre('save', function(next) {
+    var date;
+
+    date = new Date();
+
+    this.updated_at = date;
+
+    if (!this.created_at) {
+        this.created_at = date;
+    }
+
+    next();
+});
+
 // export user model
-module.exports = mongo.model('User', user);
+module.exports = mongo.model('User', userSchema);
