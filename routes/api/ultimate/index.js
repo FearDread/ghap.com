@@ -9,6 +9,8 @@ sdata = require(path + 'routes/api/ultimate/sdata.js');
 /* Ultimate Totals API */
 exports.add = function(app, passport) {
 
+    sdata.add(app);
+
     app.use('/ut/', function(req, res, next) {
         console.log('Ultimate Totals API :: ' + utils.path(req));
 
@@ -188,6 +190,4 @@ exports.add = function(app, passport) {
                 return res.json({success: true, user: user, status: 200});
             });
         });
-
-    sdata.add(app);
 };

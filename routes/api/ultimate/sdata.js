@@ -74,4 +74,24 @@ exports.add = function (app) {
 
                  });
          });
+
+    app.route('/ut/sdata/injury')
+        
+        .get(function (req, res) {
+            var injuries, results;
+
+            injuries = sdata.getInjuries()
+                
+                .success(function (data) {
+                    if (data) {
+                        results = JSON.parse(data);
+
+                        return res.json({
+                            success: true,
+                            injuries: results,
+                            status: 200
+                        });
+                    }
+                });
+        });
 };
