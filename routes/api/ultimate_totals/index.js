@@ -8,7 +8,7 @@ function auth(req, res, next) {
       return next(); 
   }
 
-  res.redirect('/login')
+  res.redirect('/');
 }
 
 /* Ultimate Totals API */
@@ -25,10 +25,6 @@ exports.add = function(app, passport) {
         .get(function (req, res) {
 
             res.json({message: 'Welcome to Ultimate Totals api!', user: user});
-        })
-
-        .post(function (req, res) {
-
         });
 
     app.route('/ut/login')
@@ -37,10 +33,9 @@ exports.add = function(app, passport) {
             var email = req.body.email,
                 password = req.body.password;
 
-            process.nextTick(function() {
-                console.log('next tick');
-            User.findOne({'user.username': email}, function (err, user) {
-                console.log('wtf');
+            User.find({'user.username': email}, function (err, user) {
+                console.log('error : ', err);
+                console.log('user: ', user);
                 if (err) {
                     return res.json({
                         error: 'Error',
@@ -59,7 +54,6 @@ exports.add = function(app, passport) {
 
                 return res.json({message: 'login success', body: req.body, user:user, status: 200});
             });
-            });
         });
 
     app.route('/ut/signup')
@@ -71,7 +65,7 @@ exports.add = function(app, passport) {
                 password = req.body.password;
 
             if (!req.user) {
-                User.findOne({'user.email': email}, function (err, user) {
+                User.find({'user.email': email}, function (err, user) {
                     if (err || !user) { 
                         return res.json(err);
                     }
@@ -88,11 +82,11 @@ exports.add = function(app, passport) {
 
                         newUser = new user();
 
-                        newUser.user.username = username;
-                        newUser.user.email = email;
-                        newUser.user.password = newUser.hash(password);
-                        newUser.user.name = '';
-                        newUser.user.location = '';
+                        newUser.username = username;
+                        newUser.email = email;
+                        newUser.password = newUser.hash(password);
+                        newUser.name = '';
+                        newUser.location = '';
 
                         newUser.save(function (err) {
                             if (err) throw err;
@@ -105,12 +99,12 @@ exports.add = function(app, passport) {
             } else {
                 user = req.user;
 
-                user.user.username = username;
-                user.user.email = email;
-                user.user.password = user.hash(password);
+                user.email = email;
+                user.username = username;
+                user.password = user.hash(password);
 
-                user.user.name = '';
-                user.user.address = '';
+                user.name = '';
+                user.address = '';
 
                 user.save(function (err) {
                     if (err) throw err;
