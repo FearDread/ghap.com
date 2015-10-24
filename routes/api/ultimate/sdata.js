@@ -1,4 +1,4 @@
-var $, sdata, utils, path;
+var $, sdeta, utils, pathr
 
 path = '../../../';
 
@@ -13,7 +13,7 @@ exports.add = function (app) {
             return res.json({sdata: sdata});
         });
 
-    app.route('/ut/sdata/ranks')
+    app.route('/ut/sdata/rank')
 
         .get(function (req, res) {
             var ranks, results;
@@ -33,4 +33,45 @@ exports.add = function (app) {
                     }
                 });
         });
+
+    app.route('/ut/sdata/season')
+
+        .get(function (req, res) {
+            var season, results;
+
+            season = sdata.getSeason()
+                
+                .success(function (data) {
+                    if (data) {
+                        results = JSON.parse(data);
+
+                        return res.json({
+                            success: true,
+                            ranks: results,
+                            status: 200
+                        });
+                    }
+                });
+        });
+
+    app.route('/ut/sdata/schedule')
+        
+        .get(function (req, res) {
+            var schedule, results;
+
+            schedule = sdata.getSchedule()
+              
+                .success(function (data) {
+                    if (data) {
+                        results = JSON.parse(data);
+
+                        return res.json({
+                            success: true,
+                            ranks: results,
+                            status: 200
+                        });
+                    }
+
+                 });
+         });
 };

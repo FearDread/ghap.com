@@ -5,27 +5,13 @@ config = require('../config');
 
 module.exports = {
     endpoints:{
-        ranks:'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/rankings.json?api_key=' + config.sdata.key,
-        season:'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/teams/[team_id]/statistics.xml?api_key=395ykxy34yqan3txm5zaqv6u',
-        injuries:'https://api.sportsdatallc.org/nba-t3/league/injuries.xml?api_key=395ykxy34yqan3txm5zaqv6u',
-        schedule:'https://api.sportsdatallc.org/nba-t3/games/2014/reg/schedule.xml?api_key=395ykxy34yqan3txm5zaqv6u',
-        standings:'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/standings.xml?api_key=395ykxy34yqan3txm5zaqv6u',
-        game:'http://api.sportsdatallc.org/nba-[access_level][version]/games/[game_id]/summary.xml?api_key=[your_api_key]',
-        series:'http(s)://api.sportsdatallc.org/nba-[access_level][version]/series/[season]/[nba_season]/schedule.xml?api_key=[your_api_key]'
-    },
-    set_cookie: function (name, time) {
-        $.cookie(name, 1,{
-            expires:time,
-        });
-    },
-    check_cookie: function (name) {
-        var val = $.cookie(name);
-
-        if (val) {
-            return true;
-        } else {
-            return false;
-        }
+        ranks:'https://api.sportsdatallc.org/nba-t3/seasontd/2015/reg/rankings.json?api_key=' + config.sdata.key,
+        season:'https://api.sportsdatallc.org/nba-t3/seasontd/2015/reg/teams/[team_id]/statistics.json?api_key=' + config.sdata.key,
+        injuries:'https://api.sportsdatallc.org/nba-t3/league/injuries.json?api_key=' + config.sdata.key,
+        schedule:'https://api.sportsdatallc.org/nba-t3/games/2015/reg/schedule.json?api_key=' + config.sdata.key,
+        standings:'https://api.sportsdatallc.org/nba-t3/seasontd/2015/reg/standings.json?api_key=' + config.sdata.key,
+        game:'http://api.sportsdatallc.org/nba-[access_level][version]/games/[game_id]/summary.json?api_key=' + config.sdata.key,
+        series:'http(s)://api.sportsdatallc.org/nba-[access_level][version]/series/[season]/[nba_season]/schedule.xml?api_key=' + config.sdata.key
     },
     getInjuries: function () {
         return $({url:this.endpoints.injuries}); 
