@@ -14,7 +14,7 @@ bodyParser = require('body-parser');
 
 /* APIs */
 routes = require('./routes');
-ultimate = require('./routes/api/ultimate_totals');
+ultimate = require('./routes/api/ultimate');
 
 /* Tools */
 utils = require('./src/utils');
