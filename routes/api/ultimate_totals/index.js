@@ -73,7 +73,25 @@ exports.add = function(app, passport) {
             });
         });
 
-    app.route('/ut/signup')
+    app.route('/ut/user')
+         
+        .get(function (req, res) {
+            User.find({}, function (err, users) {
+                if (users && users.length > 0) {
+
+                    return res.json({success: true, users: users, status: 200});
+
+                } else {
+
+                    return res.json({
+                        error: 'Error',
+                        success: false,
+                        message: 'No users found.',
+                        status: 304
+                    });
+                }
+            });
+        })
 
         .post(function (req, res) {
             var user, newUser,
@@ -98,13 +116,13 @@ exports.add = function(app, passport) {
                         });
 
                     } else {
-                        newUser = new user();
-
-                        newUser.name = fullname;
-                        newUser.email = email;
-                        newUser.username = username;
-                        newUser.password = newUser.hash(password);
-                        newUser.location = '';
+                        newUser = new User({
+                            name: fullname,
+                            email: email,
+                            username: username,
+                            location: '',
+                            password: newUser.hash(password)
+                        });
 
                         newUser.save(function (err) {
                             if (err) {
@@ -123,49 +141,41 @@ exports.add = function(app, passport) {
             } else {
                 user = req.user;
 
+                user.name = fullname;
                 user.email = email;
                 user.username = username;
                 user.password = user.hash(password);
 
-                user.name = '';
-                user.address = '';
-
                 user.save(function (err) {
-                    if (err) throw err;
+                    if (err) { 
+                        return res.json({
+                            error: 'Error',
+                            success: false,
+                            message: 'Unable to save user.'
+                        });
+                    }
 
                     return res.json({user: user, status: 200});
                 });
             }
         });
 
-    app.route('/ut/user')
-         
-        .get(function (req, res) {
-            User.find({}, function (err, users) {
-                if (users && users.length > 0) {
-
-                    return res.json({success: true, users: users, status: 200});
-
-                } else {
-
-                    return res.json({
-                        error: 'Error',
-                        success: false,
-                        message: 'No users found.',
-                        status: 304
-                    });
-                }
-            });
-        })
-
-        .post(function (req, res) {
-
-        });
-
     app.route('/ut/user/:id')
          
         .get(function (req, res) {
 
+            User.findById(req.param.id, function (err, user) {
+                if (err || !user) {
+                    return res.json({
+                        error: 'Error',
+                        success: false,
+                        message: 'User does not exist.',
+                        status: 304
+                    });
+                }
+
+                return res.json({success: true, user: user, status: 200});
+            });
         })
 
         .put(function (req, res) {
