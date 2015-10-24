@@ -1,10 +1,7 @@
-var json, mailer;
-
-json = exports.json = function(req) {
-    return req.query && req.query.json;
-};
+var json, mailer, utils;
 
 mailer = require('nodemailer');
+utils = require('../src/utils');
 
 exports.add = function(app) {
 

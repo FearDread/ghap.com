@@ -1,5 +1,5 @@
 /* Utility Methods */
-exports.json = exports.json = function(req) {
+exports.json = function(req) {
     return req.query && req.query.json;
 };
 
@@ -26,6 +26,10 @@ exports.path = function (req) {
     return req.url;
 };
 
+exports.isFunc = function (obj) {
+    return !!(obj && obj.constructor && obj.call && obj.apply );
+};
+
 exports.isAuth = function (req, res, next) {
     if (req.isAuthenticated()) {
         return next();
@@ -35,9 +39,5 @@ exports.isAuth = function (req, res, next) {
 };
 
 exports.merge = function (custom, defaults, deep) {
-
-};
-
-exports.isFunc = function (obj) {
 
 };

@@ -1,7 +1,8 @@
 var $, config;
 
-$ = require('jquery');
+$ = require('najax');
 config = require('../config');
+console.log('ajax? ', $.ajax);
 
 module.exports = {
     endpoints:{
@@ -28,21 +29,21 @@ module.exports = {
         }
     },
     getInjuries: function () {
-        return $.ajax({url:this.endpoints.injuries}); 
+        return $({url:this.endpoints.injuries}); 
     },
     getSeason: function () {
-        return $.ajax({url:this.endpoints.season});
+        return $({url:this.endpoints.season});
     },
     getSchedule: function () {
-        return $.ajax({url:this.endpoints.schedule}); 
+        return $({url:this.endpoints.schedule}); 
     },
     getSeries: function () {
-        return $.ajax({url:this.endpoints.series});
+        return $({url:this.endpoints.series});
     },
     getStandings: function () {
-        return $.ajax({url:this.endpoints.standings}); 
+        return $({url:this.endpoints.standings}); 
     },
     getRankings: function () {
-        return $.ajax({url:this.endpoints.ranks});
+        return $({url:this.endpoints.ranks});
     }
 };
