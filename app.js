@@ -45,7 +45,10 @@ app.use(flash());
 routes.add(app);
 ultimate.add(app, passport);
 
-mongo.connect(config.db, function () {
+mongo.connect(config.db, function (err) {
+  if (err) {
+      console.log('Error connecting: ', err);
+  }
   console.log('MongoDB connected at ' + config.db);
   
   server = app.listen(4000, function () {
