@@ -16,13 +16,21 @@ exports.add = function (app) {
     app.route('/ut/sdata/ranks')
 
         .get(function (req, res) {
-            var ranks;
+            var ranks, results;
 
             ranks = sdata.getRankings()
                 
                 .success(function (data) {
-                    console.log('ranks = ', data);
-                    return res.json({ranks: data});
+
+                    if (data) {
+                        results = JSON.parse(data);
+
+                        return res.json({
+                            success: true,
+                            ranks: results,
+                            status: 200
+                        });
+                    }
                 });
         });
 };
