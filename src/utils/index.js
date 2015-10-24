@@ -4,7 +4,9 @@ exports.json = function(req) {
 };
 
 exports.extend = function (child, parent) {
-    for (var key in parent) {
+    var key;
+
+    for (key in parent) {
         if ({}.hasOwnProperty.call(parent, key)) {
             child[key] = parent[key]; 
         } 
@@ -27,7 +29,7 @@ exports.path = function (req) {
 };
 
 exports.isFunc = function (obj) {
-    return !!(obj && obj.constructor && obj.call && obj.apply );
+    return !!(obj && obj.constructor && obj.call && obj.apply);
 };
 
 exports.isAuth = function (req, res, next) {
@@ -43,14 +45,14 @@ exports.merge = function (custom, defaults, deep) {
 };
 
 exports.xmlToJson = function (xml) {
-    var obj = {};
+    var old, obj = {}, i, j, item, nodeName, attribute;
 
     if (xml.nodeType == 1) { 
         if (xml.attributes.length > 0) {
             obj["@attributes"] = {};
 
-            for (var j = 0; j < xml.attributes.length; j++) {
-                var attribute = xml.attributes.item(j);
+            for (j = 0; j < xml.attributes.length; j++) {
+                attribute = xml.attributes.item(j);
 
                 obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
             }
@@ -60,15 +62,15 @@ exports.xmlToJson = function (xml) {
     }
 
     if (xml.hasChildNodes()) {
-        for(var i = 0; i < xml.childNodes.length; i++) {
-            var item = xml.childNodes.item(i);
-            var nodeName = item.nodeName;
+        for(i = 0; i < xml.childNodes.length; i++) {
+            item = xml.childNodes.item(i);
+            nodeName = item.nodeName;
 
             if (typeof(obj[nodeName]) == "undefined") {
                 obj[nodeName] = xmlToJson(item);
             } else {
                 if (typeof(obj[nodeName].push) == "undefined") {
-                    var old = obj[nodeName];
+                    old = obj[nodeName];
 
                     obj[nodeName] = [];
                     obj[nodeName].push(old);
