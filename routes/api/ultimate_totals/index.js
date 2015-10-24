@@ -16,7 +16,10 @@ exports.add = function(app, passport) {
 
     app.use('/ut/', function(req, res, next) {
         console.log('Something is happening on Ultimate Totals API.');
-        // add logic to check for token
+
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
         next(); 
     });
 
@@ -24,7 +27,21 @@ exports.add = function(app, passport) {
 
         .get(function (req, res) {
 
-            res.json({message: 'Welcome to Ultimate Totals api!', user: user});
+            var ghap = new User({
+                name: 'Garrett',
+                username: 'GHAP',
+                email: 'ghaptonstall@gmail.com',
+                password: 'doggie'
+            });
+            console.log('user = ', ghap);
+
+            ghap.save(function (err) {
+                console.log('wtf');
+                if (err) throw err;
+
+                console.log('User GHAP Saved');
+                res.json({message: 'Welcome to Ultimate Totals api!', user: ghap});
+            });
         });
 
     app.route('/ut/login')
