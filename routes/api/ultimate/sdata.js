@@ -27,7 +27,7 @@ exports.add = function (app) {
 
                         return res.json({
                             success: true,
-                            ranks: results,
+                            data: results,
                             status: 200
                         });
                     }
@@ -47,7 +47,7 @@ exports.add = function (app) {
 
                         return res.json({
                             success: true,
-                            ranks: results,
+                            data: results,
                             status: 200
                         });
                     }
@@ -67,7 +67,7 @@ exports.add = function (app) {
 
                         return res.json({
                             success: true,
-                            ranks: results,
+                            data: results,
                             status: 200
                         });
                     }
@@ -88,7 +88,7 @@ exports.add = function (app) {
 
                         return res.json({
                             success: true,
-                            injuries: results,
+                            data: results,
                             status: 200
                         });
                     }

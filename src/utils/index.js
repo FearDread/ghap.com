@@ -49,8 +49,32 @@ exports.isAuth = function (req, res, next) {
     return res.json({success: false, message: 'Your not authenticated, please login.'});
 };
 
-exports.merge = function (custom, defaults, deep) {
+exports.merge = function (out) {
+    var i = 1, obj, key;
 
+    out = out || {};
+
+    for (i < arguments.length; i++) {
+        obj = arguments[i];
+
+        if (!obj)
+            continue;
+
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                if (typeof obj[key] === 'object') {
+
+                    merge(out[key], obj[key]);
+
+                } else {
+
+                    out[key] = obj[key];
+                }
+            }
+        }
+    }
+
+    return out;
 };
 
 exports.xmlToJson = function (xml) {
@@ -91,4 +115,8 @@ exports.xmlToJson = function (xml) {
     }
 
     return obj;
+};
+
+exports.each = function(array) {
+    return array.forEach.call(array);
 };
