@@ -24,6 +24,15 @@ exports.extend = function (child, parent) {
     return child;
 };
 
+exports.addError = function (msg) {
+    return {
+        success: false,
+        error: true,
+        message: msg || "Error ...",
+        status: 400
+    };
+};
+
 exports.path = function (req) {
     return req.url;
 };

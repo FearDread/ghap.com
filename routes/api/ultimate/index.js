@@ -45,25 +45,17 @@ exports.add = function(app, passport) {
 
         .post(function (req, res) {
             var username = req.body.username,
-                password = req.body.password;
+                password = req.body.password,
+                error = utils.addError('User does not exist.'); 
 
             User.findOne({username: username}, function (err, user) {
                 if (err || !user) {
-                    return res.json({
-                        error: 'Error',
-                        success: false,
-                        message: 'User does not exist.',
-                        status: 304
-                    });
+                    return res.json(error);
                 }
 
                 if (user && !user.verify(password)) {
-                    return res.json({
-                        error: 'Error',
-                        success: false,
-                        message: 'Enter correct password.',
-                        status: 304 
-                    });
+                    error = utils.addError('Incorrect password.');
+                    return res.json(error);
                 }
 
                 return res.json({success: true, message: 'login success', user:user, status: 200});
@@ -73,6 +65,8 @@ exports.add = function(app, passport) {
     app.route('/ut/user')
          
         .get(function (req, res) {
+            error = utils.addError('No users found.');
+
             User.find({}, function (err, users) {
                 if (users && users.length > 0) {
 
@@ -80,37 +74,29 @@ exports.add = function(app, passport) {
 
                 } else {
 
-                    return res.json({
-                        error: 'Error',
-                        success: false,
-                        message: 'No users found.',
-                        status: 304
-                    });
+                    return res.json(error);
                 }
             });
         })
 
         .post(function (req, res) {
-            var user, newUser,
+            var user, newUser, error,
                 fullname = req.body.first_name + ' ' + req.body.last_name,
                 email = req.body.email,
                 username = req.body.username,
                 password = req.body.password;
 
             if (!req.user) {
+                error = utils.addError('User already exists.');
+
                 User.findOne({username: username}, function (err, user) {
                     if (err || !user) { 
-                        return res.json(err);
+                        return res.json(error);
                     }
 
                     if (user) {
 
-                        return res.json({
-                            error: 'Error',
-                            success: false,
-                            message: 'User already exists.',
-                            status: 304 
-                        });
+                        return res.json(error);
 
                     } else {
                         newUser = new User({
@@ -122,12 +108,10 @@ exports.add = function(app, passport) {
                         });
 
                         newUser.save(function (err) {
+                            error = utils.addError('Unable to save user.');
+
                             if (err) {
-                                return res.json({
-                                    error: 'Error',
-                                    success: false,
-                                    message: 'Unable to save user.'
-                                });
+                                return res.json(error);
                             }
 
                             return res.json({success: true, user: newUser, status: 200});
@@ -141,15 +125,11 @@ exports.add = function(app, passport) {
                 user.name = fullname;
                 user.email = email;
                 user.username = username;
-                user.password = user.hash(password);
 
                 user.save(function (err) {
+                    error = utils.addError('Unable to save user.'); 
                     if (err) { 
-                        return res.json({
-                            error: 'Error',
-                            success: false,
-                            message: 'Unable to save user.'
-                        });
+                        return res.json(error);
                     }
 
                     return res.json({user: user, status: 200});
