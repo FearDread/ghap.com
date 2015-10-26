@@ -50,11 +50,11 @@ exports.isAuth = function (req, res, next) {
 };
 
 exports.merge = function (out) {
-    var i = 1, obj, key;
+    var i, obj, key;
 
     out = out || {};
 
-    for (i < arguments.length; i++) {
+    for (i = 1; i < arguments.length; i++) {
         obj = arguments[i];
 
         if (!obj)
