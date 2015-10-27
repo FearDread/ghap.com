@@ -31,6 +31,36 @@ exports.add = function (app) {
                             status: 200
                         });
                     }
+                })
+                .error(function (err) {
+                  if (err) {
+                    return res.json(utils.addError(err));
+                  }
+                });
+        });
+
+    app.route('/ut/sdata/standing')
+
+        .get(function (req, res) {
+            var standings, results;
+
+            standings = sdata.getStandings()
+
+                .success(function (data) {
+                    if (data) {
+                        results = JSON.parse(data);
+
+                        return res.json({
+                            success: true,
+                            data: results,
+                            status: 200
+                        });
+                    }
+                })
+                .error(function (err) {
+                  if (err) {
+                    return res.json(utils.addError(err));
+                  }
                 });
         });
 
@@ -51,6 +81,11 @@ exports.add = function (app) {
                             status: 200
                         });
                     }
+                })
+                .error(function (err) {
+                  if (err) {
+                    return res.json(utils.addError(err));
+                  }
                 });
         });
 
@@ -71,8 +106,13 @@ exports.add = function (app) {
                             status: 200
                         });
                     }
-                 });
-         });
+                })
+                .error(function (err) {
+                  if (err) {
+                    return res.json(utils.addError(err));
+                  }
+                });
+        });
 
     app.route('/ut/sdata/injury')
         
@@ -91,6 +131,11 @@ exports.add = function (app) {
                             status: 200
                         });
                     }
+                })
+                .error(function (err) {
+                  if (err) {
+                    return res.json(utils.addError(err));
+                  }
                 });
         });
 
