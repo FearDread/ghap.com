@@ -5,7 +5,7 @@ config = require('../config');
 
 module.exports = {
     endpoints:{
-        odds: 'https://api.sportradar.us/odds-basic/v3?api_key=' + config.sdata.key,
+        odds: 'https://api.sportradar.us/odds-b1?api_key=' + config.sdata.key,
         ranks: 'https://api.sportsdatallc.org/nba-t3/seasontd/2014/reg/rankings.json?api_key=' + config.sdata.key,
         season: 'https://api.sportsdatallc.org/nba-t3/seasontd/2015/reg/teams/[team_id]/statistics.json?api_key=' + config.sdata.key,
         injuries: 'https://api.sportsdatallc.org/nba-t3/league/injuries.json?api_key=' + config.sdata.key,

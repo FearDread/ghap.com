@@ -1,4 +1,4 @@
-var $, sdeta, utils, pathr
+var $, sdeta, utils, path;
 
 path = '../../../';
 
@@ -102,7 +102,6 @@ exports.add = function (app) {
             odds = sdata.getOdds()
 
                 .success(function (data) {
-                    console.log('odds data = ', data);
                     if (data) {
                         results = JSON.parse(data);
 
@@ -112,6 +111,12 @@ exports.add = function (app) {
                             status: 200
                         });
                     }
+                })
+                .error(function (err) {
+                  if (err) {
+
+                    return res.json(utils.addError(err));
+                  }
                 });
         });
 };
