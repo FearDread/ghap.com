@@ -93,4 +93,25 @@ exports.add = function (app) {
                     }
                 });
         });
+
+    app.route('/ut/sdata/odds')
+
+        .get(function (req, res) {
+            var odds, results;
+
+            odds = sdata.getOdds()
+
+                .success(function (data) {
+                    console.log('odds data = ', data);
+                    if (data) {
+                        results = JSON.parse(data);
+
+                        return res.json({
+                            success: true,
+                            data: results,
+                            status: 200
+                        });
+                    }
+                });
+        });
 };
