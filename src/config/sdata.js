@@ -34,5 +34,11 @@ module.exports = {
     },
     getRankings: function () {
         return $({url:this.endpoints.ranks});
+    },
+    getData: function (uri, params) {
+        return $({
+            url: uri,
+            data: (params) ? params : null
+        });
     }
 };
