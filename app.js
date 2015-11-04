@@ -1,9 +1,10 @@
 /* GHAP.com */
-var server, host, port, fs, path, express, routes, mongoStr, passport, less, utapi, app, pub, bodyParser, mongo, flash, ultimate;
+var server, host, port, fs, path, express, routes, mongoStr, passport, less, utapi, app, pub, bodyParser, mongo, flash, ultimate, assert;
 
 /* MODS */
 fs = require('fs');
 path = require('path');
+assert = require('assert');
 flash = require('connect-flash');
 express = require('express');
 session = require('express-session');
@@ -48,6 +49,7 @@ ultimate.add(app, passport);
 mongo.connect(config.db, function (err) {
   if (err) {
       console.log('Error connecting: ', err);
+      assert.equal(err, null);
   }
   console.log('MongoDB connected at ' + config.db);
   

@@ -1,7 +1,8 @@
-var User, util, path, sdata;
+var User, util, path, sdata, assert;
 
 path = '../../../';
 
+assert = require('assert');
 utils = require(path + 'src/utils');
 User = require(path + 'src/models/user.js');
 sdata = require(path + 'routes/api/ultimate/sdata.js');

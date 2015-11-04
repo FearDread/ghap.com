@@ -1,7 +1,8 @@
-var $, sdeta, utils, path;
+var $, sdeta, utils, path, assert;
 
 path = '../../../';
 
+assert = require('assert');
 utils = require(path + 'src/utils');
 sdata = require(path + 'src/config/sdata.js');
 
