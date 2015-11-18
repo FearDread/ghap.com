@@ -131,8 +131,6 @@ $.GUI().create('App', function(gui) {
 
     return {
         initPlugins: function () {
-            // $('html body').niceScroll({cursorcolor:"#FFF"});
-
             $('.open-portfolio').magnificPopup({
                 type: 'inline',
                 midClick: true,
@@ -219,6 +217,8 @@ $.GUI().create('App', function(gui) {
 
                     charm = new gui.ui.charm();
                     charm.init();
+
+                    // $('.page-info').niceScroll({styler:'fb', cursorcolor:"#FFF"});
 
                 }, 1000);
 
