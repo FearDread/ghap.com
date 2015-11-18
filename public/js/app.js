@@ -131,7 +131,7 @@ $.GUI().create('App', function(gui) {
 
     return {
         initPlugins: function () {
-            $('html').nicescroll();
+            $('html body').niceScroll({cursorcolor:"#FFF"});
 
             $('.open-portfolio').magnificPopup({
                 type: 'inline',
