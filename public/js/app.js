@@ -1,6 +1,6 @@
 /* Ghap.com App Module */
 $.GUI().create('App', function(gui) {
-    var $container, mediaListener, gmap, maps;
+    var $container, mediaListener, maps;
 
     gui.log('GUI :: ', gui);
     $container = gui.$('.page-container');
