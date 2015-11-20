@@ -856,7 +856,7 @@ ul li {
 
 .about-me .profile-image img {
   border: 5px solid #E8E8E8;
-  border-radius: 100%;
+  border-radius: 50%;
   box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.1);
   height: auto;
   margin: 15px auto;
@@ -989,7 +989,7 @@ ul li {
 /* ---------------------------------------------------- */
 
 .services {
-  background: none repeat scroll 0 0 #ff6f6f;
+  background: none repeat scroll 0 0 #a53230;
   padding: 35px 0 50px;
   position: relative;
 }
