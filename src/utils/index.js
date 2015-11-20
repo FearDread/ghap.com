@@ -37,6 +37,14 @@ exports.path = function (req) {
     return req.url;
 };
 
+exports.isObj = function (obj) {
+  return (obj instanceof Object);
+};
+
+exports.isStr = function (str) {
+  return (typeof str === 'string');
+};
+
 exports.isFunc = function (obj) {
     return !!(obj && obj.constructor && obj.call && obj.apply);
 };
