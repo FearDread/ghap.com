@@ -144,12 +144,7 @@ exports.add = function(app, passport) {
 
             User.findById(req.param.id, function (err, user) {
                 if (err || !user) {
-                    return res.json({
-                        error: 'Error',
-                        success: false,
-                        message: 'User does not exist.',
-                        status: 304
-                    });
+                    return res.json(utils.addError('User does not exist.'));
                 }
 
                 return res.json({success: true, user: user, status: 200});
@@ -160,12 +155,7 @@ exports.add = function(app, passport) {
 
             user.update(req.body, function (err) {
                 if (err) {
-                    return res.json({
-                        error: 'Error',
-                        success: false,
-                        message: 'Unable to update user.',
-                        status: 400
-                    });
+                    return res.json(utils.addError('Unable to updatge user.'));
                 }
 
                 return res.json({success: true, user: user, status: 200});
