@@ -2,7 +2,6 @@
 $.GUI().create('App', function(gui) {
     var $container, mediaListener, maps;
 
-    gui.log('GUI :: ', gui);
     $container = gui.$('.page-container');
 
     // dynamic responsive styles
@@ -218,7 +217,7 @@ $.GUI().create('App', function(gui) {
                     charm = new gui.ui.charm();
                     charm.init();
 
-                    // $('.page-info').niceScroll({styler:'fb', cursorcolor:"#FFF"});
+                    //$('.page-info').niceScroll({styler:'fb', cursorcolor:"#FFF"});
 
                 }, 1000);
 
