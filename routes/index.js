@@ -25,7 +25,7 @@ exports.add = function(app) {
             service: 'Gmail',
             auth: {
                 user: "ghaptonstall@gmail.com",
-                pass: "L337k123w05" 
+                pass: "" 
             }
         });
 
