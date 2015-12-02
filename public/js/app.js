@@ -211,13 +211,12 @@ $.GUI().create('App', function(gui) {
                     gui.$('.single-page').background({
                         afterLoaded: function() {
                             showCaption($('.single-page', $container).eq(0));
+                            $('.page-info').niceScroll({styler:'fb', cursorcolor:"#FFF"});
                         }
                     });
 
                     charm = new gui.ui.charm();
                     charm.init();
-
-                    //$('.page-info').niceScroll({styler:'fb', cursorcolor:"#FFF"});
 
                 }, 1000);
 
