@@ -1,5 +1,22 @@
 /* GHAP.com */
-var server, host, port, fs, path, express, routes, mongoStr, passport, less, utapi, app, pub, bodyParser, mongo, flash, ultimate, assert;
+var server,
+    host,
+    port,
+    fs,
+    path,
+    express,
+    routes,
+    mongoStr,
+    passport,
+    less,
+    utapi,
+    app,
+    pub,
+    bodyParser,
+    mongo,
+    flash,
+    ultimate,
+    assert;
 
 /* MODS */
 fs = require('fs');
