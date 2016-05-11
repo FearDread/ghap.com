@@ -66,7 +66,7 @@ ultimate.add(app, passport);
 mongo.connect(config.db, function (err) {
   if (err) {
       console.log('Error connecting: ', err);
-      assert.equal(err, null);
+      //assert.equal(err, null);
   }
   console.log('MongoDB connected at ' + config.db);
   
